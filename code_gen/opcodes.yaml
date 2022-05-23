@@ -1,0 +1,1488 @@
+- code: 0
+  cycles: 4
+  data: 0
+  format: NOP
+  name: NOP
+  opcode: NOP
+- code: 1
+  cycles: 10
+  data: 2
+  format: LXI BC, {0:04x}
+  name: LXI
+  opcode: 'LXI BC, #16'
+- code: 2
+  cycles: 7
+  data: 0
+  format: STAX BC
+  name: STAX
+  opcode: STAX BC
+- code: 3
+  cycles: 5
+  data: 0
+  format: INX BC
+  name: INX
+  opcode: INX BC
+- code: 4
+  cycles: 5
+  data: 0
+  format: INR B
+  name: INR
+  opcode: INR B
+- code: 5
+  cycles: 5
+  data: 0
+  format: DCR B
+  name: DCR
+  opcode: DCR B
+- code: 6
+  cycles: 7
+  data: 1
+  format: MVI B, {0:02x}
+  name: MVI
+  opcode: 'MVI B, #'
+- code: 7
+  cycles: 4
+  data: 0
+  format: RLC
+  name: RLC
+  opcode: RLC
+- code: 8
+  name: '---'
+- code: 9
+  cycles: 10
+  data: 0
+  format: DAD BC
+  name: DAD
+  opcode: DAD BC
+- code: 10
+  cycles: 7
+  data: 0
+  format: LDAX BC
+  name: LDAX
+  opcode: LDAX BC
+- code: 11
+  cycles: 5
+  data: 0
+  format: DCX BC
+  name: DCX
+  opcode: DCX BC
+- code: 12
+  cycles: 5
+  data: 0
+  format: INR C
+  name: INR
+  opcode: INR C
+- code: 13
+  cycles: 5
+  data: 0
+  format: DCR C
+  name: DCR
+  opcode: DCR C
+- code: 14
+  cycles: 7
+  data: 1
+  format: MVI C, {0:02x}
+  name: MVI
+  opcode: 'MVI C, #'
+- code: 15
+  cycles: 4
+  data: 0
+  format: RRC
+  name: RRC
+  opcode: RRC
+- code: 16
+  name: '---'
+- code: 17
+  cycles: 10
+  data: 2
+  format: LXI DE, {0:04x}
+  name: LXI
+  opcode: 'LXI DE, #16'
+- code: 18
+  cycles: 7
+  data: 0
+  format: STAX DE
+  name: STAX
+  opcode: STAX DE
+- code: 19
+  cycles: 5
+  data: 0
+  format: INX DE
+  name: INX
+  opcode: INX DE
+- code: 20
+  cycles: 5
+  data: 0
+  format: INR D
+  name: INR
+  opcode: INR D
+- code: 21
+  cycles: 5
+  data: 0
+  format: DCR D
+  name: DCR
+  opcode: DCR D
+- code: 22
+  cycles: 7
+  data: 1
+  format: MVI D, {0:02x}
+  name: MVI
+  opcode: 'MVI D, #'
+- code: 23
+  cycles: 4
+  data: 0
+  format: RAL
+  name: RAL
+  opcode: RAL
+- code: 24
+  name: '---'
+- code: 25
+  cycles: 10
+  data: 0
+  format: DAD DE
+  name: DAD
+  opcode: DAD DE
+- code: 26
+  cycles: 7
+  data: 0
+  format: LDAX DE
+  name: LDAX
+  opcode: LDAX DE
+- code: 27
+  cycles: 5
+  data: 0
+  format: DCX DE
+  name: DCX
+  opcode: DCX DE
+- code: 28
+  cycles: 5
+  data: 0
+  format: INR E
+  name: INR
+  opcode: INR E
+- code: 29
+  cycles: 5
+  data: 0
+  format: DCR E
+  name: DCR
+  opcode: DCR E
+- code: 30
+  cycles: 7
+  data: 1
+  format: MVI E, {0:02x}
+  name: MVI
+  opcode: 'MVI E, #'
+- code: 31
+  cycles: 4
+  data: 0
+  format: RAR
+  name: RAR
+  opcode: RAR
+- code: 32
+  name: '---'
+- code: 33
+  cycles: 10
+  data: 2
+  format: LXI HL, {0:04x}
+  name: LXI
+  opcode: 'LXI HL, #16'
+- code: 34
+  cycles: 16
+  data: 2
+  format: SHLD 0:04x
+  name: SHLD
+  opcode: SHLD a
+- code: 35
+  cycles: 5
+  data: 0
+  format: INX HL
+  name: INX
+  opcode: INX HL
+- code: 36
+  cycles: 5
+  data: 0
+  format: INR H
+  name: INR
+  opcode: INR H
+- code: 37
+  cycles: 5
+  data: 0
+  format: DCR H
+  name: DCR
+  opcode: DCR H
+- code: 38
+  cycles: 7
+  data: 1
+  format: MVI H, {0:02x}
+  name: MVI
+  opcode: 'MVI H, #'
+- code: 39
+  cycles: 4
+  data: 0
+  format: DAA
+  name: DAA
+  opcode: DAA
+- code: 40
+  name: '---'
+- code: 41
+  cycles: 10
+  data: 0
+  format: DAD HL
+  name: DAD
+  opcode: DAD HL
+- code: 42
+  cycles: 16
+  data: 2
+  format: LHLD 0:04x
+  name: LHLD
+  opcode: LHLD a
+- code: 43
+  cycles: 5
+  data: 0
+  format: DCX HL
+  name: DCX
+  opcode: DCX HL
+- code: 44
+  cycles: 5
+  data: 0
+  format: INR L
+  name: INR
+  opcode: INR L
+- code: 45
+  cycles: 5
+  data: 0
+  format: DCR L
+  name: DCR
+  opcode: DCR L
+- code: 46
+  cycles: 7
+  data: 1
+  format: MVI L, {0:02x}
+  name: MVI
+  opcode: 'MVI L, #'
+- code: 47
+  cycles: 4
+  data: 0
+  format: CMA
+  name: CMA
+  opcode: CMA
+- code: 48
+  name: '---'
+- code: 49
+  cycles: 10
+  data: 2
+  format: LXI SP, {0:04x}
+  name: LXI
+  opcode: 'LXI SP, #16'
+- code: 50
+  cycles: 13
+  data: 2
+  format: STA 0:04x
+  name: STA
+  opcode: STA a
+- code: 51
+  cycles: 5
+  data: 0
+  format: INX SP
+  name: INX
+  opcode: INX SP
+- code: 52
+  cycles: 10
+  data: 0
+  format: INR M
+  name: INR
+  opcode: INR M
+- code: 53
+  cycles: 10
+  data: 0
+  format: DCR M
+  name: DCR
+  opcode: DCR M
+- code: 54
+  cycles: 10
+  data: 1
+  format: MVI M, {0:02x}
+  name: MVI
+  opcode: 'MVI M, #'
+- code: 55
+  cycles: 4
+  data: 0
+  format: STC
+  name: STC
+  opcode: STC
+- code: 56
+  name: '---'
+- code: 57
+  cycles: 10
+  data: 0
+  format: DAD SP
+  name: DAD
+  opcode: DAD SP
+- code: 58
+  cycles: 13
+  data: 2
+  format: LDA 0:04x
+  name: LDA
+  opcode: LDA a
+- code: 59
+  cycles: 5
+  data: 0
+  format: DCX SP
+  name: DCX
+  opcode: DCX SP
+- code: 60
+  cycles: 5
+  data: 0
+  format: INR A
+  name: INR
+  opcode: INR A
+- code: 61
+  cycles: 5
+  data: 0
+  format: DCR A
+  name: DCR
+  opcode: DCR A
+- code: 62
+  cycles: 7
+  data: 1
+  format: MVI A, {0:02x}
+  name: MVI
+  opcode: 'MVI A, #'
+- code: 63
+  cycles: 4
+  data: 0
+  format: CMC
+  name: CMC
+  opcode: CMC
+- code: 64
+  cycles: 5
+  data: 0
+  format: MOV B,B
+  name: MOV
+  opcode: MOV B,B
+- code: 65
+  cycles: 5
+  data: 0
+  format: MOV B,C
+  name: MOV
+  opcode: MOV B,C
+- code: 66
+  cycles: 5
+  data: 0
+  format: MOV B,D
+  name: MOV
+  opcode: MOV B,D
+- code: 67
+  cycles: 5
+  data: 0
+  format: MOV B,E
+  name: MOV
+  opcode: MOV B,E
+- code: 68
+  cycles: 5
+  data: 0
+  format: MOV B,H
+  name: MOV
+  opcode: MOV B,H
+- code: 69
+  cycles: 5
+  data: 0
+  format: MOV B,L
+  name: MOV
+  opcode: MOV B,L
+- code: 70
+  cycles: 7
+  data: 0
+  format: MOV B,M
+  name: MOV
+  opcode: MOV B,M
+- code: 71
+  cycles: 5
+  data: 0
+  format: MOV B,A
+  name: MOV
+  opcode: MOV B,A
+- code: 72
+  cycles: 5
+  data: 0
+  format: MOV C,B
+  name: MOV
+  opcode: MOV C,B
+- code: 73
+  cycles: 5
+  data: 0
+  format: MOV C,C
+  name: MOV
+  opcode: MOV C,C
+- code: 74
+  cycles: 5
+  data: 0
+  format: MOV C,D
+  name: MOV
+  opcode: MOV C,D
+- code: 75
+  cycles: 5
+  data: 0
+  format: MOV C,E
+  name: MOV
+  opcode: MOV C,E
+- code: 76
+  cycles: 5
+  data: 0
+  format: MOV C,H
+  name: MOV
+  opcode: MOV C,H
+- code: 77
+  cycles: 5
+  data: 0
+  format: MOV C,L
+  name: MOV
+  opcode: MOV C,L
+- code: 78
+  cycles: 7
+  data: 0
+  format: MOV C,M
+  name: MOV
+  opcode: MOV C,M
+- code: 79
+  cycles: 5
+  data: 0
+  format: MOV C,A
+  name: MOV
+  opcode: MOV C,A
+- code: 80
+  cycles: 5
+  data: 0
+  format: MOV D,B
+  name: MOV
+  opcode: MOV D,B
+- code: 81
+  cycles: 5
+  data: 0
+  format: MOV D,C
+  name: MOV
+  opcode: MOV D,C
+- code: 82
+  cycles: 5
+  data: 0
+  format: MOV D,D
+  name: MOV
+  opcode: MOV D,D
+- code: 83
+  cycles: 5
+  data: 0
+  format: MOV D,E
+  name: MOV
+  opcode: MOV D,E
+- code: 84
+  cycles: 5
+  data: 0
+  format: MOV D,H
+  name: MOV
+  opcode: MOV D,H
+- code: 85
+  cycles: 5
+  data: 0
+  format: MOV D,L
+  name: MOV
+  opcode: MOV D,L
+- code: 86
+  cycles: 7
+  data: 0
+  format: MOV D,M
+  name: MOV
+  opcode: MOV D,M
+- code: 87
+  cycles: 5
+  data: 0
+  format: MOV D,A
+  name: MOV
+  opcode: MOV D,A
+- code: 88
+  cycles: 5
+  data: 0
+  format: MOV E,B
+  name: MOV
+  opcode: MOV E,B
+- code: 89
+  cycles: 5
+  data: 0
+  format: MOV E,C
+  name: MOV
+  opcode: MOV E,C
+- code: 90
+  cycles: 5
+  data: 0
+  format: MOV E,D
+  name: MOV
+  opcode: MOV E,D
+- code: 91
+  cycles: 5
+  data: 0
+  format: MOV E,E
+  name: MOV
+  opcode: MOV E,E
+- code: 92
+  cycles: 5
+  data: 0
+  format: MOV E,H
+  name: MOV
+  opcode: MOV E,H
+- code: 93
+  cycles: 5
+  data: 0
+  format: MOV E,L
+  name: MOV
+  opcode: MOV E,L
+- code: 94
+  cycles: 7
+  data: 0
+  format: MOV E,M
+  name: MOV
+  opcode: MOV E,M
+- code: 95
+  cycles: 5
+  data: 0
+  format: MOV E,A
+  name: MOV
+  opcode: MOV E,A
+- code: 96
+  cycles: 5
+  data: 0
+  format: MOV H,B
+  name: MOV
+  opcode: MOV H,B
+- code: 97
+  cycles: 5
+  data: 0
+  format: MOV H,C
+  name: MOV
+  opcode: MOV H,C
+- code: 98
+  cycles: 5
+  data: 0
+  format: MOV H,D
+  name: MOV
+  opcode: MOV H,D
+- code: 99
+  cycles: 5
+  data: 0
+  format: MOV H,E
+  name: MOV
+  opcode: MOV H,E
+- code: 100
+  cycles: 5
+  data: 0
+  format: MOV H,H
+  name: MOV
+  opcode: MOV H,H
+- code: 101
+  cycles: 5
+  data: 0
+  format: MOV H,L
+  name: MOV
+  opcode: MOV H,L
+- code: 102
+  cycles: 7
+  data: 0
+  format: MOV H,M
+  name: MOV
+  opcode: MOV H,M
+- code: 103
+  cycles: 5
+  data: 0
+  format: MOV H,A
+  name: MOV
+  opcode: MOV H,A
+- code: 104
+  cycles: 5
+  data: 0
+  format: MOV L,B
+  name: MOV
+  opcode: MOV L,B
+- code: 105
+  cycles: 5
+  data: 0
+  format: MOV L,C
+  name: MOV
+  opcode: MOV L,C
+- code: 106
+  cycles: 5
+  data: 0
+  format: MOV L,D
+  name: MOV
+  opcode: MOV L,D
+- code: 107
+  cycles: 5
+  data: 0
+  format: MOV L,E
+  name: MOV
+  opcode: MOV L,E
+- code: 108
+  cycles: 5
+  data: 0
+  format: MOV L,H
+  name: MOV
+  opcode: MOV L,H
+- code: 109
+  cycles: 5
+  data: 0
+  format: MOV L,L
+  name: MOV
+  opcode: MOV L,L
+- code: 110
+  cycles: 7
+  data: 0
+  format: MOV L,M
+  name: MOV
+  opcode: MOV L,M
+- code: 111
+  cycles: 5
+  data: 0
+  format: MOV L,A
+  name: MOV
+  opcode: MOV L,A
+- code: 112
+  cycles: 7
+  data: 0
+  format: MOV M,B
+  name: MOV
+  opcode: MOV M,B
+- code: 113
+  cycles: 7
+  data: 0
+  format: MOV M,C
+  name: MOV
+  opcode: MOV M,C
+- code: 114
+  cycles: 7
+  data: 0
+  format: MOV M,D
+  name: MOV
+  opcode: MOV M,D
+- code: 115
+  cycles: 7
+  data: 0
+  format: MOV M,E
+  name: MOV
+  opcode: MOV M,E
+- code: 116
+  cycles: 7
+  data: 0
+  format: MOV M,H
+  name: MOV
+  opcode: MOV M,H
+- code: 117
+  cycles: 7
+  data: 0
+  format: MOV M,L
+  name: MOV
+  opcode: MOV M,L
+- code: 118
+  cycles: 7
+  data: 0
+  format: HLT
+  name: HLT
+  opcode: HLT
+- code: 119
+  cycles: 7
+  data: 0
+  format: MOV M,A
+  name: MOV
+  opcode: MOV M,A
+- code: 120
+  cycles: 5
+  data: 0
+  format: MOV A,B
+  name: MOV
+  opcode: MOV A,B
+- code: 121
+  cycles: 5
+  data: 0
+  format: MOV A,C
+  name: MOV
+  opcode: MOV A,C
+- code: 122
+  cycles: 5
+  data: 0
+  format: MOV A,D
+  name: MOV
+  opcode: MOV A,D
+- code: 123
+  cycles: 5
+  data: 0
+  format: MOV A,E
+  name: MOV
+  opcode: MOV A,E
+- code: 124
+  cycles: 5
+  data: 0
+  format: MOV A,H
+  name: MOV
+  opcode: MOV A,H
+- code: 125
+  cycles: 5
+  data: 0
+  format: MOV A,L
+  name: MOV
+  opcode: MOV A,L
+- code: 126
+  cycles: 7
+  data: 0
+  format: MOV A,M
+  name: MOV
+  opcode: MOV A,M
+- code: 127
+  cycles: 5
+  data: 0
+  format: MOV A,A
+  name: MOV
+  opcode: MOV A,A
+- code: 128
+  cycles: 4
+  data: 0
+  format: ADD B
+  name: ADD
+  opcode: ADD B
+- code: 129
+  cycles: 4
+  data: 0
+  format: ADD C
+  name: ADD
+  opcode: ADD C
+- code: 130
+  cycles: 4
+  data: 0
+  format: ADD D
+  name: ADD
+  opcode: ADD D
+- code: 131
+  cycles: 4
+  data: 0
+  format: ADD E
+  name: ADD
+  opcode: ADD E
+- code: 132
+  cycles: 4
+  data: 0
+  format: ADD H
+  name: ADD
+  opcode: ADD H
+- code: 133
+  cycles: 4
+  data: 0
+  format: ADD L
+  name: ADD
+  opcode: ADD L
+- code: 134
+  cycles: 7
+  data: 0
+  format: ADD M
+  name: ADD
+  opcode: ADD M
+- code: 135
+  cycles: 4
+  data: 0
+  format: ADD A
+  name: ADD
+  opcode: ADD A
+- code: 136
+  cycles: 4
+  data: 0
+  format: ADC B
+  name: ADC
+  opcode: ADC B
+- code: 137
+  cycles: 4
+  data: 0
+  format: ADC C
+  name: ADC
+  opcode: ADC C
+- code: 138
+  cycles: 4
+  data: 0
+  format: ADC D
+  name: ADC
+  opcode: ADC D
+- code: 139
+  cycles: 4
+  data: 0
+  format: ADC E
+  name: ADC
+  opcode: ADC E
+- code: 140
+  cycles: 4
+  data: 0
+  format: ADC H
+  name: ADC
+  opcode: ADC H
+- code: 141
+  cycles: 4
+  data: 0
+  format: ADC L
+  name: ADC
+  opcode: ADC L
+- code: 142
+  cycles: 7
+  data: 0
+  format: ADC M
+  name: ADC
+  opcode: ADC M
+- code: 143
+  cycles: 4
+  data: 0
+  format: ADC A
+  name: ADC
+  opcode: ADC A
+- code: 144
+  cycles: 4
+  data: 0
+  format: SUB B
+  name: SUB
+  opcode: SUB B
+- code: 145
+  cycles: 4
+  data: 0
+  format: SUB C
+  name: SUB
+  opcode: SUB C
+- code: 146
+  cycles: 4
+  data: 0
+  format: SUB D
+  name: SUB
+  opcode: SUB D
+- code: 147
+  cycles: 4
+  data: 0
+  format: SUB E
+  name: SUB
+  opcode: SUB E
+- code: 148
+  cycles: 4
+  data: 0
+  format: SUB H
+  name: SUB
+  opcode: SUB H
+- code: 149
+  cycles: 4
+  data: 0
+  format: SUB L
+  name: SUB
+  opcode: SUB L
+- code: 150
+  cycles: 7
+  data: 0
+  format: SUB M
+  name: SUB
+  opcode: SUB M
+- code: 151
+  cycles: 4
+  data: 0
+  format: SUB A
+  name: SUB
+  opcode: SUB A
+- code: 152
+  cycles: 4
+  data: 0
+  format: SBB B
+  name: SBB
+  opcode: SBB B
+- code: 153
+  cycles: 4
+  data: 0
+  format: SBB C
+  name: SBB
+  opcode: SBB C
+- code: 154
+  cycles: 4
+  data: 0
+  format: SBB D
+  name: SBB
+  opcode: SBB D
+- code: 155
+  cycles: 4
+  data: 0
+  format: SBB E
+  name: SBB
+  opcode: SBB E
+- code: 156
+  cycles: 4
+  data: 0
+  format: SBB H
+  name: SBB
+  opcode: SBB H
+- code: 157
+  cycles: 4
+  data: 0
+  format: SBB L
+  name: SBB
+  opcode: SBB L
+- code: 158
+  cycles: 7
+  data: 0
+  format: SBB M
+  name: SBB
+  opcode: SBB M
+- code: 159
+  cycles: 4
+  data: 0
+  format: SBB A
+  name: SBB
+  opcode: SBB A
+- code: 160
+  cycles: 4
+  data: 0
+  format: ANA B
+  name: ANA
+  opcode: ANA B
+- code: 161
+  cycles: 4
+  data: 0
+  format: ANA C
+  name: ANA
+  opcode: ANA C
+- code: 162
+  cycles: 4
+  data: 0
+  format: ANA D
+  name: ANA
+  opcode: ANA D
+- code: 163
+  cycles: 4
+  data: 0
+  format: ANA E
+  name: ANA
+  opcode: ANA E
+- code: 164
+  cycles: 4
+  data: 0
+  format: ANA H
+  name: ANA
+  opcode: ANA H
+- code: 165
+  cycles: 4
+  data: 0
+  format: ANA L
+  name: ANA
+  opcode: ANA L
+- code: 166
+  cycles: 7
+  data: 0
+  format: ANA M
+  name: ANA
+  opcode: ANA M
+- code: 167
+  cycles: 4
+  data: 0
+  format: ANA A
+  name: ANA
+  opcode: ANA A
+- code: 168
+  cycles: 4
+  data: 0
+  format: XRA B
+  name: XRA
+  opcode: XRA B
+- code: 169
+  cycles: 4
+  data: 0
+  format: XRA C
+  name: XRA
+  opcode: XRA C
+- code: 170
+  cycles: 4
+  data: 0
+  format: XRA D
+  name: XRA
+  opcode: XRA D
+- code: 171
+  cycles: 4
+  data: 0
+  format: XRA E
+  name: XRA
+  opcode: XRA E
+- code: 172
+  cycles: 4
+  data: 0
+  format: XRA H
+  name: XRA
+  opcode: XRA H
+- code: 173
+  cycles: 4
+  data: 0
+  format: XRA L
+  name: XRA
+  opcode: XRA L
+- code: 174
+  cycles: 7
+  data: 0
+  format: XRA M
+  name: XRA
+  opcode: XRA M
+- code: 175
+  cycles: 4
+  data: 0
+  format: XRA A
+  name: XRA
+  opcode: XRA A
+- code: 176
+  cycles: 4
+  data: 0
+  format: ORA B
+  name: ORA
+  opcode: ORA B
+- code: 177
+  cycles: 4
+  data: 0
+  format: ORA C
+  name: ORA
+  opcode: ORA C
+- code: 178
+  cycles: 4
+  data: 0
+  format: ORA D
+  name: ORA
+  opcode: ORA D
+- code: 179
+  cycles: 4
+  data: 0
+  format: ORA E
+  name: ORA
+  opcode: ORA E
+- code: 180
+  cycles: 4
+  data: 0
+  format: ORA H
+  name: ORA
+  opcode: ORA H
+- code: 181
+  cycles: 4
+  data: 0
+  format: ORA L
+  name: ORA
+  opcode: ORA L
+- code: 182
+  cycles: 7
+  data: 0
+  format: ORA M
+  name: ORA
+  opcode: ORA M
+- code: 183
+  cycles: 4
+  data: 0
+  format: ORA A
+  name: ORA
+  opcode: ORA A
+- code: 184
+  cycles: 4
+  data: 0
+  format: CMP B
+  name: CMP
+  opcode: CMP B
+- code: 185
+  cycles: 4
+  data: 0
+  format: CMP C
+  name: CMP
+  opcode: CMP C
+- code: 186
+  cycles: 4
+  data: 0
+  format: CMP D
+  name: CMP
+  opcode: CMP D
+- code: 187
+  cycles: 4
+  data: 0
+  format: CMP E
+  name: CMP
+  opcode: CMP E
+- code: 188
+  cycles: 4
+  data: 0
+  format: CMP H
+  name: CMP
+  opcode: CMP H
+- code: 189
+  cycles: 4
+  data: 0
+  format: CMP L
+  name: CMP
+  opcode: CMP L
+- code: 190
+  cycles: 7
+  data: 0
+  format: CMP M
+  name: CMP
+  opcode: CMP M
+- code: 191
+  cycles: 4
+  data: 0
+  format: CMP A
+  name: CMP
+  opcode: CMP A
+- code: 192
+  cycles: 11
+  data: 0
+  format: RNZ
+  name: R
+  opcode: RNZ
+- code: 193
+  cycles: 10
+  data: 0
+  format: POP BC
+  name: POP
+  opcode: POP BC
+- code: 194
+  cycles: 10
+  data: 2
+  format: JNZ, {0:04x}
+  name: J
+  opcode: JNZ a
+- code: 195
+  cycles: 10
+  data: 2
+  format: JMP 0:04x
+  name: JMP
+  opcode: JMP a
+- code: 196
+  cycles: 17
+  data: 2
+  format: CNZ, {0:04x}
+  name: C
+  opcode: CNZ a
+- code: 197
+  cycles: 11
+  data: 0
+  format: PUSH BC
+  name: PUSH
+  opcode: PUSH BC
+- code: 198
+  cycles: 7
+  data: 1
+  format: ADI 0:02x
+  name: ADI
+  opcode: 'ADI #'
+- code: 199
+  cycles: 11
+  data: 0
+  format: RST 0
+  name: RST
+  opcode: RST 0
+- code: 200
+  cycles: 11
+  data: 0
+  format: RZ
+  name: R
+  opcode: RZ
+- code: 201
+  cycles: 10
+  data: 0
+  format: RET
+  name: RET
+  opcode: RET
+- code: 202
+  cycles: 10
+  data: 2
+  format: JZ, {0:04x}
+  name: J
+  opcode: JZ a
+- code: 203
+  name: '---'
+- code: 204
+  cycles: 10
+  data: 2
+  format: CZ, {0:04x}
+  name: C
+  opcode: CZ a
+- code: 205
+  cycles: 17
+  data: 2
+  format: CALL 0:04x
+  name: CALL
+  opcode: CALL a
+- code: 206
+  cycles: 7
+  data: 1
+  format: ACI 0:02x
+  name: ACI
+  opcode: 'ACI #'
+- code: 207
+  cycles: 11
+  data: 0
+  format: RST 1
+  name: RST
+  opcode: RST 1
+- code: 208
+  cycles: 11
+  data: 0
+  format: RNC
+  name: R
+  opcode: RNC
+- code: 209
+  cycles: 10
+  data: 0
+  format: POP DE
+  name: POP
+  opcode: POP DE
+- code: 210
+  cycles: 10
+  data: 2
+  format: JNC, {0:04x}
+  name: J
+  opcode: JNC a
+- code: 211
+  cycles: 10
+  data: 1
+  format: OUT 0:02x
+  name: OUT
+  opcode: OUT p
+- code: 212
+  cycles: 17
+  data: 2
+  format: CNC, {0:04x}
+  name: C
+  opcode: CNC a
+- code: 213
+  cycles: 11
+  data: 0
+  format: PUSH DE
+  name: PUSH
+  opcode: PUSH DE
+- code: 214
+  cycles: 7
+  data: 1
+  format: SUI 0:02x
+  name: SUI
+  opcode: 'SUI #'
+- code: 215
+  cycles: 11
+  data: 0
+  format: RST 2
+  name: RST
+  opcode: RST 2
+- code: 216
+  cycles: 11
+  data: 0
+  format: RC
+  name: R
+  opcode: RC
+- code: 217
+  name: '---'
+- code: 218
+  cycles: 10
+  data: 2
+  format: JC, {0:04x}
+  name: J
+  opcode: JC a
+- code: 219
+  cycles: 10
+  data: 1
+  format: IN 0:02x
+  name: IN
+  opcode: IN p
+- code: 220
+  cycles: 10
+  data: 2
+  format: CC, {0:04x}
+  name: C
+  opcode: CC a
+- code: 221
+  name: '---'
+- code: 222
+  cycles: 7
+  data: 1
+  format: SBI 0:02x
+  name: SBI
+  opcode: 'SBI #'
+- code: 223
+  cycles: 11
+  data: 0
+  format: RST 3
+  name: RST
+  opcode: RST 3
+- code: 224
+  cycles: 11
+  data: 0
+  format: RPO
+  name: R
+  opcode: RPO
+- code: 225
+  cycles: 10
+  data: 0
+  format: POP HL
+  name: POP
+  opcode: POP HL
+- code: 226
+  cycles: 10
+  data: 2
+  format: JPO, {0:04x}
+  name: J
+  opcode: JPO a
+- code: 227
+  cycles: 18
+  data: 0
+  format: XTHL
+  name: XTHL
+  opcode: XTHL
+- code: 228
+  cycles: 17
+  data: 2
+  format: CPO, {0:04x}
+  name: C
+  opcode: CPO a
+- code: 229
+  cycles: 11
+  data: 0
+  format: PUSH HL
+  name: PUSH
+  opcode: PUSH HL
+- code: 230
+  cycles: 7
+  data: 1
+  format: ANI 0:02x
+  name: ANI
+  opcode: 'ANI #'
+- code: 231
+  cycles: 11
+  data: 0
+  format: RST 4
+  name: RST
+  opcode: RST 4
+- code: 232
+  cycles: 11
+  data: 0
+  format: RPE
+  name: R
+  opcode: RPE
+- code: 233
+  cycles: 5
+  data: 0
+  format: PCHL
+  name: PCHL
+  opcode: PCHL
+- code: 234
+  cycles: 10
+  data: 2
+  format: JPE, {0:04x}
+  name: J
+  opcode: JPE a
+- code: 235
+  cycles: 5
+  data: 0
+  format: XCHG
+  name: XCHG
+  opcode: XCHG
+- code: 236
+  cycles: 17
+  data: 2
+  format: CPE, {0:04x}
+  name: C
+  opcode: CPE a
+- code: 237
+  name: '---'
+- code: 238
+  cycles: 7
+  data: 1
+  format: XRI 0:02x
+  name: XRI
+  opcode: 'XRI #'
+- code: 239
+  cycles: 11
+  data: 0
+  format: RST 5
+  name: RST
+  opcode: RST 5
+- code: 240
+  cycles: 11
+  data: 0
+  format: RP
+  name: R
+  opcode: RP
+- code: 241
+  cycles: 10
+  data: 0
+  format: POP PSW
+  name: POP
+  opcode: POP PSW
+- code: 242
+  cycles: 10
+  data: 2
+  format: JP, {0:04x}
+  name: J
+  opcode: JP a
+- code: 243
+  cycles: 4
+  data: 0
+  format: DI
+  name: DI
+  opcode: DI
+- code: 244
+  cycles: 17
+  data: 2
+  format: CP, {0:04x}
+  name: C
+  opcode: CP a
+- code: 245
+  cycles: 11
+  data: 0
+  format: PUSH PSW
+  name: PUSH
+  opcode: PUSH PSW
+- code: 246
+  cycles: 7
+  data: 1
+  format: ORI 0:02x
+  name: ORI
+  opcode: 'ORI #'
+- code: 247
+  cycles: 11
+  data: 0
+  format: RST 6
+  name: RST
+  opcode: RST 6
+- code: 248
+  cycles: 11
+  data: 0
+  format: RM
+  name: R
+  opcode: RM
+- code: 249
+  cycles: 5
+  data: 0
+  format: SPHL
+  name: SPHL
+  opcode: SPHL
+- code: 250
+  cycles: 10
+  data: 2
+  format: JM, {0:04x}
+  name: J
+  opcode: JM a
+- code: 251
+  cycles: 4
+  data: 0
+  format: EI
+  name: EI
+  opcode: EI
+- code: 252
+  cycles: 17
+  data: 2
+  format: CM, {0:04x}
+  name: C
+  opcode: CM a
+- code: 253
+  name: '---'
+- code: 254
+  cycles: 7
+  data: 1
+  format: CPI 0:02x
+  name: CPI
+  opcode: 'CPI #'
+- code: 255
+  cycles: 11
+  data: 0
+  format: RST 7
+  name: RST
+  opcode: RST 7
