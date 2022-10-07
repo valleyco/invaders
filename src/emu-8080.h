@@ -10,6 +10,12 @@
 #define REG_M 6 
 #define REG_FLAG  6
 #define REG_A 7
+
+#define RP_BC 0x00
+#define RP_DE 0x10
+#define RP_HL 0x20
+#define RP_SP 0x30
+
 /*
 0 C: Carry flag; set to carry out of bit 7 in result
 1 V: Undocumented signed overflow flag* (8085 only, on 8080 bit is always 1 in PSW)
@@ -40,9 +46,9 @@ struct Context
     int address_mask;
 };
 
-int emu_8080_context_init(struct Context *context, const int mem_size);
+void emu_8080_context_init(struct Context *context, const int mem_size);
 
-int emu_8080_context_free(struct Context* context);
+void emu_8080_context_free(struct Context* context);
 
 int emu_8080_rst(struct Context* context,int n);
 

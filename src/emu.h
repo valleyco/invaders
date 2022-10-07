@@ -1,10 +1,12 @@
 #pragma once
+#include <stdlib.h>
 #include "emu-8080.h"
+
 // 100 ms
 #define CPU_8080_HZ 2000000
 #define TICK_INTERVAL 100
 #define CPU_8080_CLOCKS_PER_TICK (CPU_8080_HZ / TICK_INTERVAL)  
-
+#define CYCLES_PER_SCREEN_INTERRUPT ((int)(CPU_8080_HZ / 60))
 
 enum event_types
 {
@@ -29,9 +31,12 @@ struct Emulator
 {
     struct Context *context;
     int clock_ticks;
-    int int_count;
     char memory[16768];
+    char port[8];
     struct EventQueue event_queue;
+    int shift_register;
+    int screen_int_count;
+    int screen_int_half;
 };
 
 struct Emulator *emu_new();
@@ -40,3 +45,4 @@ void emu_get_mem(struct Emulator *emulator, int pos, int length, char *buffer);
 void emu_free(struct Emulator *emulator);
 void emu_event_add(struct Emulator *emulator, struct Event event);
 int emu_execute(struct Emulator *emulator, int clocks_ticks);
+size_t load_rom(struct Emulator *emulator, const char* filename);

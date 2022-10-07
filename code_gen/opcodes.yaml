@@ -189,7 +189,7 @@
 - code: 34
   cycles: 16
   data: 2
-  format: SHLD 0:04x
+  format: SHLD {0:04x}
   name: SHLD
   opcode: SHLD a
 - code: 35
@@ -233,7 +233,7 @@
 - code: 42
   cycles: 16
   data: 2
-  format: LHLD 0:04x
+  format: LHLD {0:04x}
   name: LHLD
   opcode: LHLD a
 - code: 43
@@ -277,7 +277,7 @@
 - code: 50
   cycles: 13
   data: 2
-  format: STA 0:04x
+  format: STA {0:04x}
   name: STA
   opcode: STA a
 - code: 51
@@ -321,7 +321,7 @@
 - code: 58
   cycles: 13
   data: 2
-  format: LDA 0:04x
+  format: LDA {0:04x}
   name: LDA
   opcode: LDA a
 - code: 59
@@ -1143,7 +1143,7 @@
 - code: 195
   cycles: 10
   data: 2
-  format: JMP 0:04x
+  format: JMP {0:04x}
   name: JMP
   opcode: JMP a
 - code: 196
@@ -1161,7 +1161,7 @@
 - code: 198
   cycles: 7
   data: 1
-  format: ADI 0:02x
+  format: ADI {0:02x}
   name: ADI
   opcode: 'ADI #'
 - code: 199
@@ -1199,13 +1199,13 @@
 - code: 205
   cycles: 17
   data: 2
-  format: CALL 0:04x
+  format: CALL {0:04x}
   name: CALL
   opcode: CALL a
 - code: 206
   cycles: 7
   data: 1
-  format: ACI 0:02x
+  format: ACI {0:02x}
   name: ACI
   opcode: 'ACI #'
 - code: 207
@@ -1235,7 +1235,7 @@
 - code: 211
   cycles: 10
   data: 1
-  format: OUT 0:02x
+  format: OUT {0:02x}
   name: OUT
   opcode: OUT p
 - code: 212
@@ -1253,7 +1253,7 @@
 - code: 214
   cycles: 7
   data: 1
-  format: SUI 0:02x
+  format: SUI {0:02x}
   name: SUI
   opcode: 'SUI #'
 - code: 215
@@ -1279,7 +1279,7 @@
 - code: 219
   cycles: 10
   data: 1
-  format: IN 0:02x
+  format: IN {0:02x}
   name: IN
   opcode: IN p
 - code: 220
@@ -1293,7 +1293,7 @@
 - code: 222
   cycles: 7
   data: 1
-  format: SBI 0:02x
+  format: SBI {0:02x}
   name: SBI
   opcode: 'SBI #'
 - code: 223
@@ -1341,7 +1341,7 @@
 - code: 230
   cycles: 7
   data: 1
-  format: ANI 0:02x
+  format: ANI {0:02x}
   name: ANI
   opcode: 'ANI #'
 - code: 231
@@ -1385,7 +1385,7 @@
 - code: 238
   cycles: 7
   data: 1
-  format: XRI 0:02x
+  format: XRI {0:02x}
   name: XRI
   opcode: 'XRI #'
 - code: 239
@@ -1433,7 +1433,7 @@
 - code: 246
   cycles: 7
   data: 1
-  format: ORI 0:02x
+  format: ORI {0:02x}
   name: ORI
   opcode: 'ORI #'
 - code: 247
@@ -1477,7 +1477,7 @@
 - code: 254
   cycles: 7
   data: 1
-  format: CPI 0:02x
+  format: CPI {0:02x}
   name: CPI
   opcode: 'CPI #'
 - code: 255

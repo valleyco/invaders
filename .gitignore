@@ -18,3 +18,4 @@ config.status
 /src/Makefile
 /src/emu_8080
 null.d
+/rom

@@ -2,30 +2,37 @@
 #include <stdlib.h>
 #include "emu-8080.h"
 
-extern int fetch_pc_byte(struct Context* context){
+int inline fetch_pc_byte(struct Context *context)
+{
     return context->memory[(context->PC++ & 0xffff)];
 }
-extern int fetch_pc_word(struct Context* context){
+int inline fetch_pc_word(struct Context *context)
+{
     return fetch_pc_byte(context) + fetch_pc_byte(context) << 8;
 }
 
-static inline int get_source(int op, struct Context* context){
+static inline int get_source(int op, struct Context *context)
+{
     return op & 0x7;
 }
 
-static inline int get_destination(int op, struct Context* context){
+static inline int get_destination(int op, struct Context *context)
+{
     return (op >> 3) & 0x7;
 }
 
-static inline int get_rp(int op){
+static inline int get_rp(int op)
+{
     return (op >> 4) & 0x3;
 }
 
-static inline int get_condition(int op){
+static inline int get_condition(int op)
+{
     return (op >> 3) & 0x7;
 }
 
-static inline int is_parity_even(int b){
+static inline int is_parity_even(int b)
+{
     b ^= b >> 4;
     b ^= b >> 2;
     b ^= b >> 1;
@@ -36,27 +43,26 @@ static inline int is_parity_even(int b){
 // P_FLAG = 2;
 // S_FLAG = 3;
 
-// AC is not update here will be impleented in the relevant instruction
-static inline void update_flags(struct Context *context, int reg){
+// AC is not update here will be implemented in the relevant instruction
+static inline void update_flags(struct Context *context, int reg, int inc_c)
+{
     context->flag[Z_FLAG] = context->reg[reg] == 0;
-    context->flag[C_FLAG] = (context->reg[reg] & 0xf00) > 0;
-    context->flag[P_FLAG] = is_parity_even(context->reg[reg]) ;
+    if(inc_c){
+        context->flag[C_FLAG] = (context->reg[reg] & 0xf00) > 0;
+    }
+    context->flag[P_FLAG] = is_parity_even(context->reg[reg]);
     context->flag[S_FLAG] = context->reg[reg] & 0x80;
     context->reg[reg] &= 0xff;
+}
 
-} 
-
-static inline void pack_flags(struct Context *context){
-        context->reg[REG_FLAG] = 
-            context->flag[C_FLAG] ?  0x01 : 0 |
-                                     0x02     |
-            context->flag[P_FLAG] ?  0x04 : 0 |
-                                     0x08 * 0 |
-            context->flag[A_FLAG] ?  0x10 : 0 |
-                                     0x20 * 0 | 
-            context->flag[Z_FLAG] ?  0x40 : 0 |
-            context->flag[S_FLAG] ?  0x80 : 0;
-
+static inline void pack_flags(struct Context *context)
+{
+    context->reg[REG_FLAG] =
+        context->flag[C_FLAG] ? 0x01 : 0 | 0x02 | context->flag[P_FLAG]   ? 0x04
+                                   : 0 | 0x08 * 0 | context->flag[A_FLAG] ? 0x10
+                                   : 0 | 0x20 * 0 | context->flag[Z_FLAG] ? 0x40
+                                   : 0 | context->flag[S_FLAG]            ? 0x80
+                                                                          : 0;
 }
 
 static inline void unpack_flags(struct Context *context)
@@ -68,361 +74,526 @@ static inline void unpack_flags(struct Context *context)
     context->flag[S_FLAG] = context->reg[REG_FLAG] & 0x80;
 }
 
+static inline int get_m(struct Context *context)
+{
+    return context->memory[context->reg[REG_L] + (context->reg[REG_H] << 8)];
+}
+
+static inline void set_m(struct Context *context, int val)
+{
+    context->memory[context->reg[REG_L] + (context->reg[REG_H] << 8)] = val;
+}
+
 // http://www.nacad.ufrj.br/online/intel/vtune/users_guide/mergedProjects/analyzer_ec/mergedProjects/reference_olh/mergedProjects/instructions/instruct32_hh/vc71.htm
-static inline int inst_8080_mov(struct Context* context, int op){
-    const int cycles = 5; 
+static inline int inst_8080_mov(struct Context *context, int op)
+{
+    const int cycles = 5;
+    if ((op & 7) == REG_M)
+    {
+        context->reg[(op >> 7) & 7] = get_m(context);
+    }
+    else if ((op & 070) == REG_M << 3)
+    {
+        set_m(context, context->reg[op & 7]);
+    }
+    else
+    {
+        context->reg[(op >> 7) & 7] = context->reg[op & 7];
+    }
+    return cycles;
+}
+
+static inline int inst_8080_mvi(struct Context *context, int op)
+{
+    const int cycles = 7;
+    if (op == 0b00110110)
+    {
+        set_m(context, fetch_pc_byte(context));
+        return cycles + 3 ;
+    }
+    else
+    {
+        context->reg[op >> 7] = fetch_pc_byte(context);
+        return cycles;
+    }
+}
+
+static inline int inst_8080_lxi(struct Context *context, int op)
+{
+    const int cycles = 10;
+    switch (op & 0x30)
+    {
+    case RP_BC:
+        context->reg[REG_C] = fetch_pc_byte(context);
+        context->reg[REG_B] = fetch_pc_byte(context);
+        break;
+    case RP_DE:
+        context->reg[REG_E] = fetch_pc_byte(context);
+        context->reg[REG_D] = fetch_pc_byte(context);
+        break;
+    case RP_HL:
+        context->reg[REG_L] = fetch_pc_byte(context);
+        context->reg[REG_H] = fetch_pc_byte(context);
+        break;
+    case RP_SP:
+        context->SP = fetch_pc_word(context);
+        break;
+    }
+    return cycles;
+}
+
+static inline int inst_8080_lda(struct Context *context, int op)
+{
+    const int cycles = 13;
+    context->reg[REG_A] = context->memory[fetch_pc_word(context)];
+    return cycles;
+}
+
+static inline int inst_8080_sta(struct Context *context, int op)
+{
+    const int cycles = 13;
+    context->memory[fetch_pc_word(context)] = context->reg[REG_A];
+    return cycles;
+}
+
+static inline int inst_8080_lhld(struct Context *context, int op)
+{
+    const int cycles = 16;
+    int addr = fetch_pc_word(context);
+    context->reg[REG_L] = context->memory[addr];
+    context->reg[REG_H] = context->memory[addr + 1];
+    return cycles;
+}
+
+static inline int inst_8080_shld(struct Context *context, int op)
+{
+    const int cycles = 16;
+    int addr = fetch_pc_word(context);
+    context->memory[addr] = context->reg[REG_L];
+    context->memory[addr + 1] = context->reg[REG_H];
+    return cycles;
+}
+
+static inline int inst_8080_ldax(struct Context *context, int op)
+{
+    const int cycles = 7;
+    int addr;
+    switch (op & 0x30)
+    {
+    case RP_BC:
+        addr = context->reg[REG_C] + (context->reg[REG_B] << 8);
+        break;
+    case RP_DE:
+        addr = context->reg[REG_E] + (context->reg[REG_D] << 8);
+        break;
+    }
+    context->reg[REG_A] = context->memory[addr];
+    return cycles;
+}
+
+static inline int inst_8080_stax(struct Context *context, int op)
+{
+    const int cycles = 7;
+    int addr;
+    switch (op & 0x30)
+    {
+    case RP_BC:
+        addr = context->reg[REG_C] + (context->reg[REG_B] << 8);
+        break;
+    case RP_DE:
+        addr = context->reg[REG_E] + (context->reg[REG_D] << 8);
+        break;
+    }
+    context->memory[addr] = context->reg[REG_A];
+    return cycles;
+}
+
+static inline int inst_8080_xchg(struct Context *context, int op)
+{
+    const int cycles = 5;
+    int tmp = context->reg[REG_E];
+    context->reg[REG_E] = context->reg[REG_L];
+    context->reg[REG_L] = tmp;
+    tmp = context->reg[REG_D];
+    context->reg[REG_D] = context->reg[REG_H];
+    context->reg[REG_H] = tmp;
+    return cycles;
+}
+
+static inline void inst_8080_add_common(struct Context *context, int val, int c)
+{
+    context->flag[A_FLAG] = ((context->reg[REG_A] & 0xf) + ((val + c) & 0xf)) > 0xf;
+    context->reg[REG_A] += (val + c);
+    update_flags(context, REG_A, 1);
+
+}
+
+static inline int inst_8080_add(struct Context *context, int op)
+{
+    const int cycles = 4;
+    const int val = (op == 0b10000110) ? get_m(context) : context->reg[op & 7];
+    inst_8080_add_common(context, val, 0);
+    return cycles;
+}
+
+static inline int inst_8080_adi(struct Context *context, int op)
+{
+    const int cycles = 7;
+    const int val = fetch_pc_byte(context);
+    inst_8080_add_common(context, val, 0);
+    return cycles;
+}
+
+static inline int inst_8080_adc(struct Context *context, int op)
+{
+    const int cycles = 4;
+    const int val = (op == 0b10000110) ? get_m(context) : context->reg[op & 7];
+    inst_8080_add_common(context, val, context->flag[C_FLAG] == 0 ? 0 :1);
+    return cycles;
+}
+
+static inline int inst_8080_aci(struct Context *context, int op)
+{
+    const int cycles = 7;
+    const int val = fetch_pc_byte(context);
+    inst_8080_add_common(context, val, context->flag[C_FLAG] == 0 ? 0 :1);
+    return cycles;
+}
+
+static inline int inst_8080_sub(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_mvi(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_sui(struct Context *context, int op)
+{
+    const int cycles = 7;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_lxi(struct Context* context, int op){
-    const int cycles = 10; 
+static inline int inst_8080_sbb(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_lda(struct Context* context, int op){
-    const int cycles = 13; 
+static inline int inst_8080_sbi(struct Context *context, int op)
+{
+    const int cycles = 7;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_sta(struct Context* context, int op){
-    const int cycles = 13; 
+static inline int inst_8080_inr(struct Context *context, int op)
+{
+    const int cycles = 5;
+    const int reg = op >> 3;
+    int val = (op == 0b00110100)? val = get_m(context): context->reg[reg];
+    context->flag[A_FLAG] = (val & 0xf) == 0xf ? 1 : 0;
+    val++;
+    if(op == 0b00110100){
+         set_m(context, val);
+    } else {
+        context->reg[reg] = val;
+    }
+    update_flags(context, reg, 0);
+    return cycles;
+}
+
+static inline int inst_8080_dcr(struct Context *context, int op)
+{
+    const int cycles = 5;
+    const int reg = op >> 3;
+    int val = (op == 0b00110101)? val = get_m(context): context->reg[reg];
+    context->flag[A_FLAG] = (val & 0xf) == 0x0 ? 1 : 0;
+    val--;
+    if(op == 0b00110101){
+         set_m(context, val);
+    } else {
+        context->reg[op >> 3] = val;
+    }
+    update_flags(context, reg, 0);
+    return cycles;
+}
+
+static inline int inst_8080_inx(struct Context *context, int op)
+{
+    const int cycles = 5;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_lhld(struct Context* context, int op){
-    const int cycles = 16; 
+static inline int inst_8080_dcx(struct Context *context, int op)
+{
+    const int cycles = 5;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_shld(struct Context* context, int op){
-    const int cycles = 16; 
+static inline int inst_8080_dad(struct Context *context, int op)
+{
+    const int cycles = 10;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_ldax(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_daa(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_stax(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_ana(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_xchg(struct Context* context, int op){
-    const int cycles = 5; 
+static inline int inst_8080_ani(struct Context *context, int op)
+{
+    const int cycles = 7;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_add(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_ora(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_adi(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_ori(struct Context *context, int op)
+{
+    const int cycles = 7;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_adc(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_xra(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_aci(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_xri(struct Context *context, int op)
+{
+    const int cycles = 7;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_sub(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_cmp(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_sui(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_cpi(struct Context *context, int op)
+{
+    const int cycles = 7;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_sbb(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_rlc(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_sbi(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_rrc(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_inr(struct Context* context, int op){
-    const int cycles = 5; 
+static inline int inst_8080_ral(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_dcr(struct Context* context, int op){
-    const int cycles = 5; 
+static inline int inst_8080_rar(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_inx(struct Context* context, int op){
-    const int cycles = 5; 
+static inline int inst_8080_cma(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_dcx(struct Context* context, int op){
-    const int cycles = 5; 
+static inline int inst_8080_cmc(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_dad(struct Context* context, int op){
-    const int cycles = 10; 
+static inline int inst_8080_stc(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_daa(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_jmp(struct Context *context, int op)
+{
+    const int cycles = 10;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_ana(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_j(struct Context *context, int op)
+{
+    const int cycles = 10;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_ani(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_call(struct Context *context, int op)
+{
+    const int cycles = 17;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_ora(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_c(struct Context *context, int op)
+{
+    const int cycles = 17;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_ori(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_ret(struct Context *context, int op)
+{
+    const int cycles = 10;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_xra(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_r(struct Context *context, int op)
+{
+    const int cycles = 11;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_xri(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_rst(struct Context *context, int op)
+{
+    const int cycles = 11;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_cmp(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_pchl(struct Context *context, int op)
+{
+    const int cycles = 5;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_cpi(struct Context* context, int op){
-    const int cycles = 7; 
+static inline int inst_8080_push(struct Context *context, int op)
+{
+    const int cycles = 11;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_rlc(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_pop(struct Context *context, int op)
+{
+    const int cycles = 10;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_rrc(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_xthl(struct Context *context, int op)
+{
+    const int cycles = 18;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_ral(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_sphl(struct Context *context, int op)
+{
+    const int cycles = 5;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_rar(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_in(struct Context *context, int op)
+{
+    const int cycles = 10;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_cma(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_out(struct Context *context, int op)
+{
+    const int cycles = 10;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_cmc(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_ei(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_stc(struct Context* context, int op){
-    const int cycles = 4; 
+static inline int inst_8080_di(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_jmp(struct Context* context, int op){
-    const int cycles = 10; 
+static inline int inst_8080_hlt(struct Context *context, int op)
+{
+    const int cycles = 7;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_j(struct Context* context, int op){
-    const int cycles = 10; 
+static inline int inst_8080_nop(struct Context *context, int op)
+{
+    const int cycles = 4;
     // instruction not implemented yet
     return cycles;
 }
 
-static inline int inst_8080_call(struct Context* context, int op){
-    const int cycles = 17; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_c(struct Context* context, int op){
-    const int cycles = 17; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_ret(struct Context* context, int op){
-    const int cycles = 10; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_r(struct Context* context, int op){
-    const int cycles = 11; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_rst(struct Context* context, int op){
-    const int cycles = 11; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_pchl(struct Context* context, int op){
-    const int cycles = 5; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_push(struct Context* context, int op){
-    const int cycles = 11; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_pop(struct Context* context, int op){
-    const int cycles = 10; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_xthl(struct Context* context, int op){
-    const int cycles = 18; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_sphl(struct Context* context, int op){
-    const int cycles = 5; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_in(struct Context* context, int op){
-    const int cycles = 10; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_out(struct Context* context, int op){
-    const int cycles = 10; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_ei(struct Context* context, int op){
-    const int cycles = 4; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_di(struct Context* context, int op){
-    const int cycles = 4; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_hlt(struct Context* context, int op){
-    const int cycles = 7; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-static inline int inst_8080_nop(struct Context* context, int op){
-    const int cycles = 4; 
-    // instruction not implemented yet
-    return cycles;
-}
-
-
-inline static int inst_8080_illegal(struct Context* context, int op){
+inline static int inst_8080_illegal(struct Context *context, int op)
+{
     return 0;
 }
 
-int emu_8080_rst(struct Context* context, int n){
+int emu_8080_rst(struct Context *context, int n)
+{
     return inst_8080_rst(context, 0b11000111 | (n << 3));
 }
 
-int emu_8080_execute(struct Context* context){
+int emu_8080_execute(struct Context *context)
+{
     int opcode = fetch_pc_byte(context);
-    switch(opcode){
+    switch (opcode)
+    {
     case 0x00:
         return inst_8080_nop(context, opcode);
 
@@ -448,7 +619,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_rlc(context, opcode);
 
     case 0x08:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0x09:
         return inst_8080_dad(context, opcode);
 
@@ -471,7 +642,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_rrc(context, opcode);
 
     case 0x10:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0x11:
         return inst_8080_lxi(context, opcode);
 
@@ -494,7 +665,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_ral(context, opcode);
 
     case 0x18:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0x19:
         return inst_8080_dad(context, opcode);
 
@@ -517,7 +688,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_rar(context, opcode);
 
     case 0x20:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0x21:
         return inst_8080_lxi(context, opcode);
 
@@ -540,7 +711,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_daa(context, opcode);
 
     case 0x28:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0x29:
         return inst_8080_dad(context, opcode);
 
@@ -563,7 +734,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_cma(context, opcode);
 
     case 0x30:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0x31:
         return inst_8080_lxi(context, opcode);
 
@@ -586,7 +757,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_stc(context, opcode);
 
     case 0x38:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0x39:
         return inst_8080_dad(context, opcode);
 
@@ -1026,7 +1197,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_j(context, opcode);
 
     case 0xcb:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0xcc:
         return inst_8080_c(context, opcode);
 
@@ -1067,7 +1238,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_r(context, opcode);
 
     case 0xd9:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0xda:
         return inst_8080_j(context, opcode);
 
@@ -1078,7 +1249,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_c(context, opcode);
 
     case 0xdd:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0xde:
         return inst_8080_sbi(context, opcode);
 
@@ -1125,7 +1296,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_c(context, opcode);
 
     case 0xed:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0xee:
         return inst_8080_xri(context, opcode);
 
@@ -1172,20 +1343,21 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_c(context, opcode);
 
     case 0xfd:
-    return inst_8080_illegal(context, opcode);
+        return inst_8080_illegal(context, opcode);
     case 0xfe:
         return inst_8080_cpi(context, opcode);
 
     case 0xff:
         return inst_8080_rst(context, opcode);
-
     }
     return 0;
 }
-int emu_8080_context_init(struct Context *context, const int mem_size){
-    context->memory = (char*)malloc(mem_size);
+void emu_8080_context_init(struct Context *context, const int mem_size)
+{
+    context->memory = (char *)malloc(mem_size);
 }
 
-int emu_8080_context_free(struct Context *context){
+void emu_8080_context_free(struct Context *context)
+{
     free(context->memory);
 }

@@ -3,9 +3,9 @@
 #include "emu.h"
 #include "emu-screen.h"
 
-void do_update_buffer(const char const *buffer, GdkPixbuf *pixbuf)
+void do_update_buffer(const char *buffer, GdkPixbuf *pixbuf)
 {
-    const char const *p_image = buffer;
+    const char *p_image = buffer;
 
     guchar *pixbuf_pixels = gdk_pixbuf_get_pixels(pixbuf);
     int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);
@@ -35,9 +35,11 @@ void update_pixbuffer(struct Emulator *emu, GdkPixbuf *pixbuf)
     do_update_buffer(emu->memory + SCREEN_BUFFER_LOCATION, pixbuf);
 }
 
-int load_invaders(char *buffer)
+size_t load_invaders(char *buffer)
 {
     FILE *f = fopen("invaders.bmp", "r");
     fseek(f, 62, SEEK_SET);
-    return fread(buffer, 1, 7168, f);
+    size_t count = fread(buffer, 1, 7168, f);
+    fclose(f);
+    return count;
 }

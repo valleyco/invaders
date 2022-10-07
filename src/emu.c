@@ -8,10 +8,13 @@ struct Emulator *emu_new()
     struct Emulator *emulator = (struct Emulator *)malloc(sizeof(struct Emulator));
     emulator->context = (struct Context *)malloc(sizeof(struct Context));
     emulator->clock_ticks = 0;
-    emulator->int_count = 0;
     emulator->context->memory = emulator->memory;
     emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
+    emulator->shift_register = 0;
+    emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
+    emulator->screen_int_half = 0;
     load_invaders(emulator->memory + SCREEN_BUFFER_LOCATION);
+    load_rom(emulator, "../rom/invaders.rom");
     return emulator;
 }
 
@@ -59,20 +62,31 @@ static void emu_handle_events(struct Emulator *emulator)
 
 int emu_execute(struct Emulator *emulator, int clocks_ticks)
 {
-    int ticks = 0;
-    if(emulator->event_queue.event_count){
+    if (emulator->event_queue.event_count)
+    {
         emu_handle_events(emulator);
     }
-    while (clocks_ticks < ticks)
+    int ticks = 0;
+    while (ticks < clocks_ticks)
     {
-        emulator->int_count = (emulator->int_count + 1) % (CPU_8080_HZ / 60);
-        if (emulator->int_count)
-        {
-            ticks += emu_8080_execute(emulator->context);
-        } else { // 1/60 sec interrupt
-            ticks += emu_8080_rst(emulator->context, 7);
+        int cycles = emu_8080_execute(emulator->context);
+        emulator->screen_int_count -= cycles;
+        ticks += cycles;
+        if (emulator->screen_int_count < 0) {
+            ticks += emu_8080_rst(emulator->context, emulator->screen_int_half ? 2 : 1);
+            emulator->screen_int_half = 0 - (emulator->screen_int_half - 1);
+            emulator->screen_int_count += CYCLES_PER_SCREEN_INTERRUPT;
         }
     }
-    emulator->clock_ticks += ticks - clocks_ticks;
+    emulator->clock_ticks += ticks;
     return ticks;
+}
+
+size_t load_rom(struct Emulator *emulator, const char *filename)
+{
+    FILE *f = fopen(filename, "r");
+    size_t count = fread(emulator->memory, 1, 8192, f);
+    printf("rom loaded rom size=%li\n", count);
+    fclose(f);
+    return count;
 }

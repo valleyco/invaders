@@ -1,0 +1,5 @@
+REGEX_TABLE = '^([A-Z]{1,3})(ccc){0,1} {0,1}(D,#|D,S|RP,#|RP|#|D|S|a|n|p){0,1} *(.*)'
+REGEX_INST = '^([A-Z]{1,3})(ccc){0,1} {0,1}(D,#|D,S|RP,#|RP|#|D|S|a|n|p){0,1} *(.*)'
+REGEX_DEST = '[A-EHLM]'
+REGEX_SRC = '[A-EHLM]'
+REGEX_SRC_DEST = '[A-EHLM]'

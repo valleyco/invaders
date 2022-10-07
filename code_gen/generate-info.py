@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import yaml
 import numpy as np
 import re
@@ -206,11 +207,11 @@ def expand_none(m):
     result = []
     if m[2] == '#' or m[2] == 'p':
         inst = m[0] + ' ' + m[2]
-        fmt = m[0] + ' ' + '0:02x'
+        fmt = m[0] + ' ' + '{0:02x}'
         data = 1
     elif m[2] == 'a':
         inst = m[0] + ' ' + m[2]
-        fmt = m[0] + ' ' + '0:04x'
+        fmt = m[0] + ' ' + '{0:04x}'
         data = 2
     else:
         inst = m[0]
@@ -269,6 +270,7 @@ matches = regex.findall(content_list)
 
 
 for m in matches:
+    print(m)
     expand_inst(m)
 #for inst in opcodes:
 #    print(inst)
