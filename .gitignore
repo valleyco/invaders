@@ -1,6 +1,6 @@
 .vscode
 code_gen/*.yml
-code_gen/*.c
+m4
 aclocal.m4
 .deps
 /config
@@ -12,10 +12,13 @@ Makefile.in
 /aclocal.m4
 config.status
 /configure
+libtool
 *.o
+*.so
 *.gz
 *.a
 /src/Makefile
 /src/emu_8080
 null.d
 /rom
+code_gen/emu-8080.c

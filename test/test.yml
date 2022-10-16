@@ -1,5 +1,5 @@
 ---
-- name: Test mov 
+- name: Test mov
   state:
     registers:
       a: 0
@@ -9,7 +9,9 @@
       e: 0
       h: 0
       l: 0
-    mem: [0,0,0,0]  
+    mem:
+      loc: 100
+      data: [0, 0, 0, 0]
   code:
     - mov b,b
     - mov c,b
@@ -17,7 +19,7 @@
     - mov e,b
     - mov h,b
     - mov l,b
-    - mov m,b
+    - mov b,m
     - mov a,b
   expected:
     registers:
@@ -28,4 +30,6 @@
       e: 5
       h: 5
       l: 5
-    mem: [5,0,0,0]  
+    mem:
+      loc: 100
+      data: [5, 0, 0, 0]

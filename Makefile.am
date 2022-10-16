@@ -1,3 +1,3 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src
+SUBDIRS = 8080/src src 
 EXTRA_DIST = autogen.sh

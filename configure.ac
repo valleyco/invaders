@@ -20,12 +20,14 @@ AC_PROG_CC
 #AC_PROG_CXX
 AC_PROG_RANLIB
 AM_PROG_AR
+#LT_INIT
+AC_CONFIG_MACRO_DIRS([m4])
 # We can add more checks in this section
 
 # Tells automake to create a Makefile
 # See https://www.gnu.org/software/automake/manual/html_node/Requirements.html
 #AC_CONFIG_FILES([Makefile src/Makefile dip/Makefile])
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile 8080/src/Makefile src/Makefile])
 
 PKG_CHECK_MODULES([GTK3],[gtk+-3.0], [], [AC_MSG_ERROR([GTK not in path])])
 

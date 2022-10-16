@@ -4,8 +4,8 @@ import numpy as np
 import re
 opcodes = [None] * 256
 for i in range(256):
-  opcodes[i] = {'name':"---",'code': i} 
-   
+    opcodes[i] = {'name': "---", 'code': i}
+
 REG = ['B', 'C', 'D', 'E', 'H', 'L', 'M', 'A']  # regular (8 bit registers)
 REG_P = ['BC', 'DE', 'HL', 'SP']  # register pair (16 bit)
 REG_PA = ['BC', 'DE', 'HL', 'PSW']  # alternative register pair
@@ -36,6 +36,7 @@ CYCLES = [
     11, 10, 10, 4, 17, 11, 7, 11, 11, 5, 10, 4, 17, 17, 7, 11,
 ]
 
+
 def get_opcode_mask(code):
     i = 0
     for ch in code:
@@ -57,12 +58,12 @@ def expand_ds(m):
             code = opcode_base | (dest << 3) | source
             inst = m[0] + ' ' + REG[dest] + ',' + REG[source]
             result.append({
-                'name' : m[0],
+                'name': m[0],
                 'code': code,
                 'opcode': inst,
                 'format': inst,
                 'data': 0,
-                'cycles' : CYCLES[code] 
+                'cycles': CYCLES[code]
             })
     return result
 
@@ -74,12 +75,12 @@ def expand_destination(m):
         code = opcode_base | (dest << 3)
         inst = m[0] + ' ' + REG[dest]
         result.append({
-            'name' : m[0],
+            'name': m[0],
             'code': code,
             'opcode': inst,
             'format': inst,
             'data': 0,
-            'cycles' : CYCLES[code]
+            'cycles': CYCLES[code]
         })
     return result
 
@@ -91,12 +92,13 @@ def expand_destination_c(m):
         code = opcode_base | (dest << 3)
         inst = m[0] + ' ' + REG[dest] + ', #'
         result.append({
-            'name' : m[0],
+            'name': m[0],
             'code': code,
             'opcode': inst,
             'format': m[0] + ' ' + REG[dest] + ', {0:02x}',
             'data': 1,
-            'cycles' : CYCLES[code]
+            'regex': m[0] + ' ' + REG[dest] + ',[\\t ]*([1-9]+[0-9]*)',
+            'cycles': CYCLES[code]
         })
     return result
 
@@ -108,12 +110,12 @@ def expand_source(m):
         code = opcode_base | source
         inst = m[0] + ' ' + REG[source]
         result.append({
-            'name' : m[0],
+            'name': m[0],
             'code': code,
             'opcode': inst,
             'format': inst,
             'data': 0,
-            'cycles' : CYCLES[code]
+            'cycles': CYCLES[code]
         })
     return result
 
@@ -133,12 +135,12 @@ def expand_register_pair(m):
         code = opcode_base | rp << 4
         inst = m[0] + ' ' + reg[rp]
         result.append({
-            'name' : m[0],
+            'name': m[0],
             'code': code,
             'opcode': inst,
             'format': inst,
             'data': 0,
-            'cycles' : CYCLES[code]
+            'cycles': CYCLES[code]
         })
     return result
 
@@ -150,12 +152,13 @@ def expand_register_pair_c(m):
         code = opcode_base | rp << 4
         inst = m[0] + ' ' + REG_P[rp] + ', #16'
         result.append({
-            'name' : m[0],
+            'name': m[0],
             'code': code,
             'opcode': inst,
             'format': m[0] + ' ' + REG_P[rp] + ', {0:04x}',
             'data': 2,
-            'cycles' : CYCLES[code]
+            'regex': m[0] + ' ' + REG_P[rp] + ',[\\t ]*([1-9]+[0-9]*)',
+            'cycles': CYCLES[code]
         })
     return result
 
@@ -167,12 +170,12 @@ def expand_n(m):
         code = opcode_base | n << 3
         inst = m[0] + ' ' + str(n)
         result.append({
-            'name' : m[0],
+            'name': m[0],
             'code': code,
             'opcode': inst,
             'format': inst,
             'data': 0,
-            'cycles' : CYCLES[code]
+            'cycles': CYCLES[code]
         })
     return result
 
@@ -182,49 +185,60 @@ def expand_condition(m):
     result = []
     for con in range(8):
         code = opcode_base | con << 3
+        regex = None
         if m[2] == 'a':  # ret
             inst = m[0] + COND[con] + ' a'
-            fmt = m[0] + COND[con] + ', {0:04x}'
+            fmt = m[0] + COND[con] + ' {0:04x}'
+            regex = m[0] + COND[con] + '[\\t ]+([1-9]+[0-9]*)'
             data = 2
         else:
             inst = m[0] + COND[con]
             fmt = inst
             data = 0
-
-        result.append({
-            'name' : m[0],
+        record = {
+            'name': m[0],
             'code': code,
             'opcode': inst,
             'format': fmt,
             'data': data,
-            'cycles' : CYCLES[code]
-        })
+            'cycles': CYCLES[code]
+        }
+        if regex is not None:
+            record['regex'] = regex
+
+        result.append(record)
     return result
 
 
 def expand_none(m):
     code = get_opcode_mask(m[4])
+    regex = None
     result = []
     if m[2] == '#' or m[2] == 'p':
         inst = m[0] + ' ' + m[2]
         fmt = m[0] + ' ' + '{0:02x}'
+        regex = m[0] + '[\\t ]*([1-9]+[0-9]*)'
         data = 1
     elif m[2] == 'a':
         inst = m[0] + ' ' + m[2]
         fmt = m[0] + ' ' + '{0:04x}'
+        regex = m[0] + '[\\t ]*([1-9]+[0-9]*)'
         data = 2
     else:
         inst = m[0]
         fmt = m[0]
         data = 0
-    result.append({
-        'name' : m[0],
+    record = {
+        'name': m[0],
         'code': code,
         'opcode': inst,
         'format': fmt,
         'data': data,
-        'cycles' : CYCLES[code]
-    })
+        'cycles': CYCLES[code]
+    }
+    if regex is not None:
+        record['regex'] = regex
+    result.append(record)
     return result
 
 
@@ -249,9 +263,9 @@ def expand_inst(m):
         opcode = expand_none(m)
     else:
         print(m)
-        exit (1)
+        exit(1)
     for op in opcode:
-        opcodes[op['code']] = op    
+        opcodes[op['code']] = op
 
 
 def get_instruction_info(m):
@@ -259,7 +273,7 @@ def get_instruction_info(m):
     return {
         'name': m[0],
         'data': opcodes[code]['data'],
-        'cycles' : CYCLES[code]
+        'cycles': CYCLES[code]
     }
 
 
@@ -270,9 +284,9 @@ matches = regex.findall(content_list)
 
 
 for m in matches:
-    print(m)
+#    print(m)
     expand_inst(m)
-#for inst in opcodes:
+# for inst in opcodes:
 #    print(inst)
 
 instructions = []
@@ -284,4 +298,3 @@ with open(r'./instructions.yaml', 'w') as file:
 
 with open(r'./opcodes.yaml', 'w') as file:
     documents = yaml.dump(opcodes, file)
-
