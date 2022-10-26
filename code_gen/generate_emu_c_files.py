@@ -18,7 +18,7 @@ template = env.get_template('./template-emu-8080.c')
 
 output = template.render(instructions=instructions, opcodes= opcodes)
 with open(r'./emu-8080.c','w') as file:
-    file.write(output);
+    file.write(output)
 #print(output)
 cycles=[]
 #print(instructions)

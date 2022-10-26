@@ -14,11 +14,14 @@ config.status
 /configure
 libtool
 *.o
+*.la
+*.lo
 *.so
 *.gz
 *.a
+.libs
 /src/Makefile
-/src/emu_8080
+/src/emu_invaders
 null.d
 /rom
 code_gen/emu-8080.c
