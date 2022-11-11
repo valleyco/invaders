@@ -7,8 +7,8 @@ extern inline int fetch_pc_byte(struct Context *context)
     return context->memory[(context->PC++ & 0xffff)];
 }
 extern inline int fetch_pc_word(struct Context *context)
-{
-    return fetch_pc_byte(context) + (fetch_pc_byte(context) << 8);
+{   int word = fetch_pc_byte(context);
+    return word + (fetch_pc_byte(context) << 8);
 }
 
 extern inline int get_source(int op, struct Context *context)

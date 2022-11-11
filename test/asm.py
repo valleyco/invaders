@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 import yaml
 import re
+import os
+current_dir = os.path.dirname(__file__)
 
 no_param_instructions = {}
 param_instructions = {}
 
-with open(r'./opcodes.yaml') as file:
+with open(current_dir + r'/../code_gen/opcodes.yaml') as file:
     opcodes = yaml.full_load(file)
 
 for opcode in opcodes:
@@ -16,7 +18,7 @@ for opcode in opcodes:
     else:
         param_instructions[opcode['regex']] = [opcode['code'], opcode['data']]
 
-def asm(line: str):
+def asm(line: str) -> list:
     cmd = line.strip().replace("  ", " ").upper()
 
     if cmd in no_param_instructions:

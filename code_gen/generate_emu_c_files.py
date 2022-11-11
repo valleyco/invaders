@@ -1,23 +1,24 @@
-from itertools import cycle
+#!/usr/bin/python3
+import os
 import yaml
 import numpy as np
-from jinja2 import FileSystemLoader, Environment, PackageLoader, select_autoescape
-from jinja2 import Template
+from jinja2 import FileSystemLoader, Environment
 
 
+current_dir = os.path.dirname(__file__)
 env = Environment(
     loader=FileSystemLoader('./')
 )
 
-with open(r'./instructions.yaml') as file:
+with open(current_dir + r'/instructions.yaml') as file:
     instructions = yaml.full_load(file)
-with open(r'./opcodes.yaml') as file:
+with open(current_dir + '/opcodes.yaml') as file:
     opcodes = yaml.full_load(file)
 
-template = env.get_template('./template-emu-8080.c')
+template = env.get_template(current_dir + '/template-emu-8080.c')
 
 output = template.render(instructions=instructions, opcodes= opcodes)
-with open(r'./emu-8080.c','w') as file:
+with open(current_dir + r'/emu-8080.c','w') as file:
     file.write(output);
 #print(output)
 cycles=[]

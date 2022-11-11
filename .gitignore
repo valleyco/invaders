@@ -17,8 +17,13 @@ libtool
 *.so
 *.gz
 *.a
+*.la
+*.lo
 /src/Makefile
-/src/emu_8080
+/src/emu_invaders
+
 null.d
 /rom
 code_gen/emu-8080.c
+.libs
+__pycache__

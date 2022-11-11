@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 #import numpy as np
 import yaml
-with open(r'./opcodes.yaml') as file:
+import os
+current_dir = os.path.dirname(__file__)
+with open(current_dir + r'/../code_gen/opcodes.yaml') as file:
     opcodes = yaml.full_load(file)
 decode_table = {}
 
@@ -34,8 +36,9 @@ def decode(bytes, offset: int):
 
 
 if __name__ == '__main__':
-    pos = 0 
+    pos = 0
     code = [71, 198, 8, 202, 2, 1]
+    code =[64, 72, 80, 88, 96, 104, 70, 120]
     while pos < len(code):
         data = decode(code, pos)
         print(data)

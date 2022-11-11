@@ -1,5 +1,6 @@
 ---
-- name: Test mov
+- name: test mov
+  reset: false
   state:
     registers:
       a: 0
@@ -9,9 +10,9 @@
       e: 0
       h: 0
       l: 0
-    mem:
-      loc: 100
-      data: [0, 0, 0, 0]
+    memory:
+      - location: 100
+        data: [0, 0, 0, 0]
   code:
     - mov b,b
     - mov c,b
@@ -19,8 +20,8 @@
     - mov e,b
     - mov h,b
     - mov l,b
-    - mov b,m
     - mov a,b
+    - mov m,b
   expected:
     registers:
       a: 5
@@ -30,6 +31,109 @@
       e: 5
       h: 5
       l: 5
-    mem:
-      loc: 100
-      data: [5, 0, 0, 0]
+    memory:
+      - location: 1285
+        data: [5]
+- name: test mvi
+  code:
+    - mvi b,1
+    - mvi c,2
+    - mvi d,3
+    - mvi e,4
+    - mvi h,5
+    - mvi l,6
+    - mvi m,7
+    - mvi a,8
+  expected:
+    registers:
+      a: 8
+      b: 1
+      c: 2
+      d: 3
+      e: 4
+      h: 5
+      l: 6
+    memory:
+      - location: 1286
+        data: [7]
+- name: test lxi
+  code:
+    - lxi bc, 258
+    - lxi de, 772
+    - lxi hl, 1286
+    - lxi sp, 1800
+  expected:
+    registers:
+      b: 1
+      c: 2
+      d: 3
+      e: 4
+      h: 5
+      l: 6
+      sp: 1800
+- name: test lda
+  state:
+    memory:
+      - location: 100
+        data: [20]
+  code:
+    - lda 100
+  expected:
+    registers:
+      a: 20
+- name: test sta
+  code:
+    - mvi a, 25
+    - sta 100
+  expected:
+    memory:
+      - location: 100
+        data: [25]
+- name: test lhld
+  state:
+    memory:
+      - location: 100
+        data: [0, 1]
+      - location: 256
+        data: [1, 2]
+  code:
+    - lhld 100
+  expected:
+    registers:
+      l: 1
+      h: 2
+
+- name: test shld
+  state:
+    memory:
+      - location: 100
+        data: [0, 1]
+  code:
+    - lxi hl,513
+    - shld 100
+  expected:
+    memory:
+      - location: 256
+        data: [1, 2]
+- name: test ldax bc
+  state:
+    memory:
+      - location: 100
+        data: [25, 1]
+  code:
+    - lxi bc, 100
+    - ldax bc
+  expected:
+    registers:
+      a: 25
+- name: test ldax de
+  state:
+    memory:
+      - location: 100
+        data: [25, 1]
+  code:
+    - lxi de, 100
+    - ldax de
+  expected:
+    registers:
+      a: 25

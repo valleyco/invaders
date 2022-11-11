@@ -26,9 +26,9 @@ int emu_8080_execute(struct Context* context){
 {%- for opcode in opcodes %}
     case 0x{{ "%02x" | format( opcode.code | int) }}:
 {%- if opcode.name != '---' %}
-        return inst_8080_{{ opcode.name | lower }}(context, opcode);
+        return inst_8080_{{ opcode.name | lower }}(context, 0x{{ "%02x" | format( opcode.code | int) }});
 {% else %}
-    return inst_8080_illegal(context, opcode);
+    return inst_8080_illegal(context, 0x{{ "%02x" | format( opcode.code | int) }});
 {%- endif %}
 {%- endfor %}
     }
