@@ -1,82 +1,11 @@
 #!/usr/bin/python3
-import os
 import sys
 import traceback
 from ctypes import *
 import yaml
 from asm import asm
-
+from  emu8080 import *
 current_dir = os.path.dirname(__file__)
-emu8080 = cdll.LoadLibrary(current_dir +
-                           "/../8080/src/.libs/libemu_8080.so")
-REG_B = 0
-REG_C = 1
-REG_D = 2
-REG_E = 3
-REG_H = 4
-REG_L = 5
-REG_M = 6
-REG_A = 7
-
-Z_FLAG = 0
-C_FLAG = 1
-P_FLAG = 2
-S_FLAG = 3
-A_FLAG = 4
-
-reg_map = {
-    'a': REG_A,
-    'b': REG_B,
-    'c': REG_C,
-    'd': REG_D,
-    'e': REG_E,
-    'h': REG_H,
-    'l': REG_L,
-    'm': REG_A,
-}
-
-flag_map = {
-    'Z': Z_FLAG,
-    'C': C_FLAG,
-    'P': P_FLAG,
-    'S': S_FLAG,
-    'A': A_FLAG,
-}
-
-
-class Emu8080Context(Structure):
-    _fields_ = [
-        ("registers", c_int * 8),
-        ("SP", c_int),
-        ("PC", c_int),
-        ("flag", c_int * 6),
-        ("halt", c_int),
-        ("interrupt", c_int),
-        ("memory", POINTER(c_char * 32768)),
-        ("port_read", CFUNCTYPE(c_int, c_int)),
-        ("port_write", CFUNCTYPE(c_int, c_int, c_int)),
-        ('address_mask', c_int),
-    ]
-
-    def __init__(self):
-        super().__init__()
-        self.memory = pointer(create_string_buffer(32768))
-
-    def print(self):
-        pass
-        print("REG: a  b  c  d  e  h  l  pc  sp")
-        print("     {0:02x} {1:02x} {2:02x} {3:02x} {4:02x} {5:02x} {6:02x} {7:04x} {8:04x} ".format(
-            self.registers[REG_A],
-            self.registers[REG_B],
-            self.registers[REG_C],
-            self.registers[REG_D],
-            self.registers[REG_E],
-            self.registers[REG_H],
-            self.registers[REG_L],
-            self.PC,
-            self.SP,
-        ))
-
 
 tests = None
 with open(current_dir + "/test.yml", "r") as stream:
@@ -100,6 +29,16 @@ def expected_memory(expected: list, context: Emu8080Context):
         expected_memory_location(e["location"], e["data"], context)
 
 
+def expected_flags(flags: dict, context: Emu8080Context):
+    for flag in flags:
+        index = flag_map[flag.upper()]
+        expected =  flags[flag] != 0
+        actual = context.flags[index] != 0
+        if (expected != actual):
+            raise Exception(
+                f"flag '{flag}' expected: {expected} found: {actual}")            
+
+
 def expected_registers(registers: dict, context: Emu8080Context):
     for reg in registers:
         if reg == 'sp':
@@ -119,6 +58,8 @@ def check_results(expected: dict, context: Emu8080Context):
         expected_registers(expected['registers'], context)
     if 'memory' in expected:
         expected_memory(expected['memory'], context)
+    if 'flags' in expected:
+        expected_flags(expected['flags'], context)
 
 
 def test_init_memory(locations: list, context: Emu8080Context):
@@ -179,7 +120,9 @@ def run_test_code(instructions: list, context: Emu8080Context):
     print(code, len(instructions))
     for i, b in enumerate(code):
         context.memory.contents[i] = b
+    print(instructions)
     for i in range(0, len(instructions)):
+        context.print()
         emu8080.emu_8080_execute(byref(context))
 
 

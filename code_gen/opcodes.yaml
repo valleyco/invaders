@@ -10,7 +10,7 @@
   format: LXI BC, {0:04x}
   name: LXI
   opcode: 'LXI BC, #16'
-  regex: LXI BC,[\t ]*([1-9]+[0-9]*)
+  regex: LXI BC,[\t ]*([0-9]+)
 - code: 2
   cycles: 7
   data: 0
@@ -41,7 +41,7 @@
   format: MVI B, {0:02x}
   name: MVI
   opcode: 'MVI B, #'
-  regex: MVI B,[\t ]*([1-9]+[0-9]*)
+  regex: MVI B,[\t ]*([0-9]+)
 - code: 7
   cycles: 4
   data: 0
@@ -86,7 +86,7 @@
   format: MVI C, {0:02x}
   name: MVI
   opcode: 'MVI C, #'
-  regex: MVI C,[\t ]*([1-9]+[0-9]*)
+  regex: MVI C,[\t ]*([0-9]+)
 - code: 15
   cycles: 4
   data: 0
@@ -101,7 +101,7 @@
   format: LXI DE, {0:04x}
   name: LXI
   opcode: 'LXI DE, #16'
-  regex: LXI DE,[\t ]*([1-9]+[0-9]*)
+  regex: LXI DE,[\t ]*([0-9]+)
 - code: 18
   cycles: 7
   data: 0
@@ -132,7 +132,7 @@
   format: MVI D, {0:02x}
   name: MVI
   opcode: 'MVI D, #'
-  regex: MVI D,[\t ]*([1-9]+[0-9]*)
+  regex: MVI D,[\t ]*([0-9]+)
 - code: 23
   cycles: 4
   data: 0
@@ -177,7 +177,7 @@
   format: MVI E, {0:02x}
   name: MVI
   opcode: 'MVI E, #'
-  regex: MVI E,[\t ]*([1-9]+[0-9]*)
+  regex: MVI E,[\t ]*([0-9]+)
 - code: 31
   cycles: 4
   data: 0
@@ -192,14 +192,14 @@
   format: LXI HL, {0:04x}
   name: LXI
   opcode: 'LXI HL, #16'
-  regex: LXI HL,[\t ]*([1-9]+[0-9]*)
+  regex: LXI HL,[\t ]*([0-9]+)
 - code: 34
   cycles: 16
   data: 2
   format: SHLD {0:04x}
   name: SHLD
   opcode: SHLD a
-  regex: SHLD[\t ]*([1-9]+[0-9]*)
+  regex: SHLD[\t ]*([0-9]+)
 - code: 35
   cycles: 5
   data: 0
@@ -224,7 +224,7 @@
   format: MVI H, {0:02x}
   name: MVI
   opcode: 'MVI H, #'
-  regex: MVI H,[\t ]*([1-9]+[0-9]*)
+  regex: MVI H,[\t ]*([0-9]+)
 - code: 39
   cycles: 4
   data: 0
@@ -245,7 +245,7 @@
   format: LHLD {0:04x}
   name: LHLD
   opcode: LHLD a
-  regex: LHLD[\t ]*([1-9]+[0-9]*)
+  regex: LHLD[\t ]*([0-9]+)
 - code: 43
   cycles: 5
   data: 0
@@ -270,7 +270,7 @@
   format: MVI L, {0:02x}
   name: MVI
   opcode: 'MVI L, #'
-  regex: MVI L,[\t ]*([1-9]+[0-9]*)
+  regex: MVI L,[\t ]*([0-9]+)
 - code: 47
   cycles: 4
   data: 0
@@ -285,14 +285,14 @@
   format: LXI SP, {0:04x}
   name: LXI
   opcode: 'LXI SP, #16'
-  regex: LXI SP,[\t ]*([1-9]+[0-9]*)
+  regex: LXI SP,[\t ]*([0-9]+)
 - code: 50
   cycles: 13
   data: 2
   format: STA {0:04x}
   name: STA
   opcode: STA a
-  regex: STA[\t ]*([1-9]+[0-9]*)
+  regex: STA[\t ]*([0-9]+)
 - code: 51
   cycles: 5
   data: 0
@@ -317,7 +317,7 @@
   format: MVI M, {0:02x}
   name: MVI
   opcode: 'MVI M, #'
-  regex: MVI M,[\t ]*([1-9]+[0-9]*)
+  regex: MVI M,[\t ]*([0-9]+)
 - code: 55
   cycles: 4
   data: 0
@@ -338,7 +338,7 @@
   format: LDA {0:04x}
   name: LDA
   opcode: LDA a
-  regex: LDA[\t ]*([1-9]+[0-9]*)
+  regex: LDA[\t ]*([0-9]+)
 - code: 59
   cycles: 5
   data: 0
@@ -363,7 +363,7 @@
   format: MVI A, {0:02x}
   name: MVI
   opcode: 'MVI A, #'
-  regex: MVI A,[\t ]*([1-9]+[0-9]*)
+  regex: MVI A,[\t ]*([0-9]+)
 - code: 63
   cycles: 4
   data: 0
@@ -1156,21 +1156,21 @@
   format: JNZ {0:04x}
   name: J
   opcode: JNZ a
-  regex: JNZ[\t ]+([1-9]+[0-9]*)
+  regex: JNZ[\t ]+([0-9]+)
 - code: 195
   cycles: 10
   data: 2
   format: JMP {0:04x}
   name: JMP
   opcode: JMP a
-  regex: JMP[\t ]*([1-9]+[0-9]*)
+  regex: JMP[\t ]*([0-9]+)
 - code: 196
   cycles: 17
   data: 2
   format: CNZ {0:04x}
   name: C
   opcode: CNZ a
-  regex: CNZ[\t ]+([1-9]+[0-9]*)
+  regex: CNZ[\t ]+([0-9]+)
 - code: 197
   cycles: 11
   data: 0
@@ -1183,7 +1183,7 @@
   format: ADI {0:02x}
   name: ADI
   opcode: 'ADI #'
-  regex: ADI[\t ]*([1-9]+[0-9]*)
+  regex: ADI[\t ]*([0-9]+)
 - code: 199
   cycles: 11
   data: 0
@@ -1208,7 +1208,7 @@
   format: JZ {0:04x}
   name: J
   opcode: JZ a
-  regex: JZ[\t ]+([1-9]+[0-9]*)
+  regex: JZ[\t ]+([0-9]+)
 - code: 203
   name: '---'
 - code: 204
@@ -1217,21 +1217,21 @@
   format: CZ {0:04x}
   name: C
   opcode: CZ a
-  regex: CZ[\t ]+([1-9]+[0-9]*)
+  regex: CZ[\t ]+([0-9]+)
 - code: 205
   cycles: 17
   data: 2
   format: CALL {0:04x}
   name: CALL
   opcode: CALL a
-  regex: CALL[\t ]*([1-9]+[0-9]*)
+  regex: CALL[\t ]*([0-9]+)
 - code: 206
   cycles: 7
   data: 1
   format: ACI {0:02x}
   name: ACI
   opcode: 'ACI #'
-  regex: ACI[\t ]*([1-9]+[0-9]*)
+  regex: ACI[\t ]*([0-9]+)
 - code: 207
   cycles: 11
   data: 0
@@ -1256,21 +1256,21 @@
   format: JNC {0:04x}
   name: J
   opcode: JNC a
-  regex: JNC[\t ]+([1-9]+[0-9]*)
+  regex: JNC[\t ]+([0-9]+)
 - code: 211
   cycles: 10
   data: 1
   format: OUT {0:02x}
   name: OUT
   opcode: OUT p
-  regex: OUT[\t ]*([1-9]+[0-9]*)
+  regex: OUT[\t ]*([0-9]+)
 - code: 212
   cycles: 17
   data: 2
   format: CNC {0:04x}
   name: C
   opcode: CNC a
-  regex: CNC[\t ]+([1-9]+[0-9]*)
+  regex: CNC[\t ]+([0-9]+)
 - code: 213
   cycles: 11
   data: 0
@@ -1283,7 +1283,7 @@
   format: SUI {0:02x}
   name: SUI
   opcode: 'SUI #'
-  regex: SUI[\t ]*([1-9]+[0-9]*)
+  regex: SUI[\t ]*([0-9]+)
 - code: 215
   cycles: 11
   data: 0
@@ -1304,21 +1304,21 @@
   format: JC {0:04x}
   name: J
   opcode: JC a
-  regex: JC[\t ]+([1-9]+[0-9]*)
+  regex: JC[\t ]+([0-9]+)
 - code: 219
   cycles: 10
   data: 1
   format: IN {0:02x}
   name: IN
   opcode: IN p
-  regex: IN[\t ]*([1-9]+[0-9]*)
+  regex: IN[\t ]*([0-9]+)
 - code: 220
   cycles: 10
   data: 2
   format: CC {0:04x}
   name: C
   opcode: CC a
-  regex: CC[\t ]+([1-9]+[0-9]*)
+  regex: CC[\t ]+([0-9]+)
 - code: 221
   name: '---'
 - code: 222
@@ -1327,7 +1327,7 @@
   format: SBI {0:02x}
   name: SBI
   opcode: 'SBI #'
-  regex: SBI[\t ]*([1-9]+[0-9]*)
+  regex: SBI[\t ]*([0-9]+)
 - code: 223
   cycles: 11
   data: 0
@@ -1352,7 +1352,7 @@
   format: JPO {0:04x}
   name: J
   opcode: JPO a
-  regex: JPO[\t ]+([1-9]+[0-9]*)
+  regex: JPO[\t ]+([0-9]+)
 - code: 227
   cycles: 18
   data: 0
@@ -1365,7 +1365,7 @@
   format: CPO {0:04x}
   name: C
   opcode: CPO a
-  regex: CPO[\t ]+([1-9]+[0-9]*)
+  regex: CPO[\t ]+([0-9]+)
 - code: 229
   cycles: 11
   data: 0
@@ -1378,7 +1378,7 @@
   format: ANI {0:02x}
   name: ANI
   opcode: 'ANI #'
-  regex: ANI[\t ]*([1-9]+[0-9]*)
+  regex: ANI[\t ]*([0-9]+)
 - code: 231
   cycles: 11
   data: 0
@@ -1403,7 +1403,7 @@
   format: JPE {0:04x}
   name: J
   opcode: JPE a
-  regex: JPE[\t ]+([1-9]+[0-9]*)
+  regex: JPE[\t ]+([0-9]+)
 - code: 235
   cycles: 5
   data: 0
@@ -1416,7 +1416,7 @@
   format: CPE {0:04x}
   name: C
   opcode: CPE a
-  regex: CPE[\t ]+([1-9]+[0-9]*)
+  regex: CPE[\t ]+([0-9]+)
 - code: 237
   name: '---'
 - code: 238
@@ -1425,7 +1425,7 @@
   format: XRI {0:02x}
   name: XRI
   opcode: 'XRI #'
-  regex: XRI[\t ]*([1-9]+[0-9]*)
+  regex: XRI[\t ]*([0-9]+)
 - code: 239
   cycles: 11
   data: 0
@@ -1450,7 +1450,7 @@
   format: JP {0:04x}
   name: J
   opcode: JP a
-  regex: JP[\t ]+([1-9]+[0-9]*)
+  regex: JP[\t ]+([0-9]+)
 - code: 243
   cycles: 4
   data: 0
@@ -1463,7 +1463,7 @@
   format: CP {0:04x}
   name: C
   opcode: CP a
-  regex: CP[\t ]+([1-9]+[0-9]*)
+  regex: CP[\t ]+([0-9]+)
 - code: 245
   cycles: 11
   data: 0
@@ -1476,7 +1476,7 @@
   format: ORI {0:02x}
   name: ORI
   opcode: 'ORI #'
-  regex: ORI[\t ]*([1-9]+[0-9]*)
+  regex: ORI[\t ]*([0-9]+)
 - code: 247
   cycles: 11
   data: 0
@@ -1501,7 +1501,7 @@
   format: JM {0:04x}
   name: J
   opcode: JM a
-  regex: JM[\t ]+([1-9]+[0-9]*)
+  regex: JM[\t ]+([0-9]+)
 - code: 251
   cycles: 4
   data: 0
@@ -1514,7 +1514,7 @@
   format: CM {0:04x}
   name: C
   opcode: CM a
-  regex: CM[\t ]+([1-9]+[0-9]*)
+  regex: CM[\t ]+([0-9]+)
 - code: 253
   name: '---'
 - code: 254
@@ -1523,7 +1523,7 @@
   format: CPI {0:02x}
   name: CPI
   opcode: 'CPI #'
-  regex: CPI[\t ]*([1-9]+[0-9]*)
+  regex: CPI[\t ]*([0-9]+)
 - code: 255
   cycles: 11
   data: 0

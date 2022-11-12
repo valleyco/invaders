@@ -40,7 +40,7 @@ struct Context
     int flag[6];
     int halt;
     int interrupt;
-    char* memory;
+    unsigned char* memory;
     int (*port_read)(int p);
     void (*port_write)(int p, int v);
     int address_mask;

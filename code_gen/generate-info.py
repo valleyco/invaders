@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-import yaml
-import numpy as np
-import re
+import yaml,os,re
+
+
 opcodes = [None] * 256
 for i in range(256):
     opcodes[i] = {'name': "---", 'code': i}
@@ -97,7 +97,7 @@ def expand_destination_c(m):
             'opcode': inst,
             'format': m[0] + ' ' + REG[dest] + ', {0:02x}',
             'data': 1,
-            'regex': m[0] + ' ' + REG[dest] + ',[\\t ]*([1-9]+[0-9]*)',
+            'regex': m[0] + ' ' + REG[dest] + ',[\\t ]*([0-9]+)',
             'cycles': CYCLES[code]
         })
     return result
@@ -157,7 +157,7 @@ def expand_register_pair_c(m):
             'opcode': inst,
             'format': m[0] + ' ' + REG_P[rp] + ', {0:04x}',
             'data': 2,
-            'regex': m[0] + ' ' + REG_P[rp] + ',[\\t ]*([1-9]+[0-9]*)',
+            'regex': m[0] + ' ' + REG_P[rp] + ',[\\t ]*([0-9]+)',
             'cycles': CYCLES[code]
         })
     return result
@@ -189,7 +189,7 @@ def expand_condition(m):
         if m[2] == 'a':  # ret
             inst = m[0] + COND[con] + ' a'
             fmt = m[0] + COND[con] + ' {0:04x}'
-            regex = m[0] + COND[con] + '[\\t ]+([1-9]+[0-9]*)'
+            regex = m[0] + COND[con] + '[\\t ]+([0-9]+)'
             data = 2
         else:
             inst = m[0] + COND[con]
@@ -217,12 +217,12 @@ def expand_none(m):
     if m[2] == '#' or m[2] == 'p':
         inst = m[0] + ' ' + m[2]
         fmt = m[0] + ' ' + '{0:02x}'
-        regex = m[0] + '[\\t ]*([1-9]+[0-9]*)'
+        regex = m[0] + '[\\t ]*([0-9]+)'
         data = 1
     elif m[2] == 'a':
         inst = m[0] + ' ' + m[2]
         fmt = m[0] + ' ' + '{0:04x}'
-        regex = m[0] + '[\\t ]*([1-9]+[0-9]*)'
+        regex = m[0] + '[\\t ]*([0-9]+)'
         data = 2
     else:
         inst = m[0]
@@ -276,8 +276,9 @@ def get_instruction_info(m):
         'cycles': CYCLES[code]
     }
 
+current_dir = os.path.dirname(__file__)
 
-my_file = open("./instruction_codes.txt", "r")
+my_file = open(current_dir + "/instruction_codes.txt", "r")
 content_list = my_file.read()
 regex = re.compile(INST_REGEX)
 matches = regex.findall(content_list)
@@ -293,8 +294,8 @@ instructions = []
 for m in matches:
     instructions.append(get_instruction_info(m))
 
-with open(r'./instructions.yaml', 'w') as file:
+with open(current_dir + r'/instructions.yaml', 'w') as file:
     documents = yaml.dump(instructions, file)
 
-with open(r'./opcodes.yaml', 'w') as file:
+with open(current_dir + r'/opcodes.yaml', 'w') as file:
     documents = yaml.dump(opcodes, file)

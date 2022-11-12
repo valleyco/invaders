@@ -94,7 +94,7 @@
     memory:
       - location: 100
         data: [0, 1]
-      - location: 256
+      - location: 0x100
         data: [1, 2]
   code:
     - lhld 100
@@ -137,3 +137,109 @@
   expected:
     registers:
       a: 25
+- name: test stax bc
+  state:
+    memory:
+      - location: 100
+        data: [0, 2]
+  code:
+    - mvi a, 23
+    - lxi bc, 100
+    - stax bc
+  expected:
+    memory:
+      - location: 100
+        data: [23, 2]
+- name: test stax de
+  state:
+    memory:
+      - location: 100
+        data: [0, 2]
+  code:
+    - mvi a, 25
+    - lxi de, 100
+    - stax de
+  expected:
+    memory:
+      - location: 100
+        data: [25, 2]
+- name: test xchg
+  code:
+    - lxi de,513
+    - lxi hl,1027
+    - xchg
+  expected:
+    registers:
+      d: 4
+      e: 3
+      h: 2
+      l: 1
+- name: test add minus 
+  code:
+    - mvi a,5
+    - mvi b,128
+    - add b
+  expected:
+    registers:
+      a: 133
+    flags:
+      z: 0
+      s: 1
+      c: 0
+      p: 0
+      a: 0
+
+- name: test add and cary
+  code:
+    - mvi a,5
+    - mvi b,255
+    - add b
+  expected:
+    registers:
+      a: 4
+    flags:
+      z: 0
+      s: 0
+      c: 1
+      p: 0
+      a: 1
+- name: test add and zero
+  code:
+    - mvi a,1
+    - mvi b,255
+    - add b
+  expected:
+    registers:
+      a: 0
+    flags:
+      z: 1
+      s: 0
+      c: 1
+      p: 1
+      a: 1
+- name: test adi 
+  code:
+    - mvi a,0
+    - adi 15
+  expected:
+    registers:
+      a: 15
+    flags:
+      z: 0
+      s: 0
+      c: 0
+      p: 1
+      a: 0
+- name: test adi carry flag
+  code:
+    - mvi a,255
+    - adi 1
+  expected:
+    registers:
+      a: 0
+    flags:
+      z: 1
+      s: 0
+      c: 1
+      p: 1
+      a: 1

@@ -46,13 +46,13 @@ extern inline int is_parity_even(int b)
 // AC is not update here will be implemented in the relevant instruction
 extern inline void update_flags(struct Context *context, int reg, int inc_c)
 {
-    context->flag[Z_FLAG] = context->reg[reg] == 0;
     if(inc_c){
         context->flag[C_FLAG] = (context->reg[reg] & 0xf00) > 0;
     }
+    context->reg[reg] &= 0xff;
+    context->flag[Z_FLAG] = context->reg[reg] == 0;
     context->flag[P_FLAG] = is_parity_even(context->reg[reg]);
     context->flag[S_FLAG] = context->reg[reg] & 0x80;
-    context->reg[reg] &= 0xff;
 }
 
 extern inline void pack_flags(struct Context *context)

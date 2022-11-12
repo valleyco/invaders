@@ -29,7 +29,7 @@ static inline int inst_8080_mvi(struct Context *context, int op)
     if (op == 0b00110110)
     {
         set_m(context, fetch_pc_byte(context));
-        return cycles + 3 ;
+        return cycles + 3;
     }
     else
     {
@@ -80,7 +80,7 @@ static inline int inst_8080_lhld(struct Context *context, int op)
 {
     const int cycles = 16;
     int addr = fetch_pc_word(context);
-    addr =  context->memory[addr] + ( context->memory[addr +1] << 8);
+    addr = context->memory[addr] + (context->memory[addr + 1] << 8);
     context->reg[REG_L] = context->memory[addr];
     context->reg[REG_H] = context->memory[addr + 1];
     return cycles;
@@ -90,7 +90,7 @@ static inline int inst_8080_shld(struct Context *context, int op)
 {
     const int cycles = 16;
     int addr = fetch_pc_word(context);
-    addr =  context->memory[addr] + ( context->memory[addr +1] << 8);
+    addr = context->memory[addr] + (context->memory[addr + 1] << 8);
     context->memory[addr] = context->reg[REG_L];
     context->memory[addr + 1] = context->reg[REG_H];
     return cycles;
@@ -144,10 +144,9 @@ static inline int inst_8080_xchg(struct Context *context, int op)
 
 static inline void inst_8080_add_common(struct Context *context, int val, int c)
 {
-    context->flag[A_FLAG] = ((context->reg[REG_A] & 0xf) + ((val + c) & 0xf)) > 0xf;
+    context->flag[A_FLAG] = ((context->reg[REG_A] & 0x0f) + ((val + c) & 0x0f)) > 0xf;
     context->reg[REG_A] += (val + c);
     update_flags(context, REG_A, 1);
-
 }
 
 static inline int inst_8080_add(struct Context *context, int op)
@@ -170,7 +169,7 @@ static inline int inst_8080_adc(struct Context *context, int op)
 {
     const int cycles = 4;
     const int val = (op == 0b10000110) ? get_m(context) : context->reg[op & 7];
-    inst_8080_add_common(context, val, context->flag[C_FLAG] == 0 ? 0 :1);
+    inst_8080_add_common(context, val, context->flag[C_FLAG] == 0 ? 0 : 1);
     return cycles;
 }
 
@@ -178,7 +177,7 @@ static inline int inst_8080_aci(struct Context *context, int op)
 {
     const int cycles = 7;
     const int val = fetch_pc_byte(context);
-    inst_8080_add_common(context, val, context->flag[C_FLAG] == 0 ? 0 :1);
+    inst_8080_add_common(context, val, context->flag[C_FLAG] == 0 ? 0 : 1);
     return cycles;
 }
 
@@ -214,12 +213,15 @@ static inline int inst_8080_inr(struct Context *context, int op)
 {
     const int cycles = 5;
     const int reg = op >> 3;
-    int val = (op == 0b00110100)? val = get_m(context): context->reg[reg];
+    int val = (op == 0b00110100) ? val = get_m(context) : context->reg[reg];
     context->flag[A_FLAG] = (val & 0xf) == 0xf ? 1 : 0;
     val++;
-    if(op == 0b00110100){
-         set_m(context, val);
-    } else {
+    if (op == 0b00110100)
+    {
+        set_m(context, val);
+    }
+    else
+    {
         context->reg[reg] = val;
     }
     update_flags(context, reg, 0);
@@ -230,12 +232,15 @@ static inline int inst_8080_dcr(struct Context *context, int op)
 {
     const int cycles = 5;
     const int reg = op >> 3;
-    int val = (op == 0b00110101)? val = get_m(context): context->reg[reg];
+    int val = (op == 0b00110101) ? val = get_m(context) : context->reg[reg];
     context->flag[A_FLAG] = (val & 0xf) == 0x0 ? 1 : 0;
     val--;
-    if(op == 0b00110101){
-         set_m(context, val);
-    } else {
+    if (op == 0b00110101)
+    {
+        set_m(context, val);
+    }
+    else
+    {
         context->reg[op >> 3] = val;
     }
     update_flags(context, reg, 0);
@@ -511,9 +516,11 @@ int emu_8080_rst(struct Context *context, int n)
     return inst_8080_rst(context, 0b11000111 | (n << 3));
 }
 
-int emu_8080_execute(struct Context* context){
+int emu_8080_execute(struct Context *context)
+{
     int opcode = fetch_pc_byte(context);
-    switch(opcode){
+    switch (opcode)
+    {
     case 0x00:
         return inst_8080_nop(context, 0x00);
 
@@ -539,7 +546,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_rlc(context, 0x07);
 
     case 0x08:
-    return inst_8080_illegal(context, 0x08);
+        return inst_8080_illegal(context, 0x08);
     case 0x09:
         return inst_8080_dad(context, 0x09);
 
@@ -562,7 +569,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_rrc(context, 0x0f);
 
     case 0x10:
-    return inst_8080_illegal(context, 0x10);
+        return inst_8080_illegal(context, 0x10);
     case 0x11:
         return inst_8080_lxi(context, 0x11);
 
@@ -585,7 +592,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_ral(context, 0x17);
 
     case 0x18:
-    return inst_8080_illegal(context, 0x18);
+        return inst_8080_illegal(context, 0x18);
     case 0x19:
         return inst_8080_dad(context, 0x19);
 
@@ -608,7 +615,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_rar(context, 0x1f);
 
     case 0x20:
-    return inst_8080_illegal(context, 0x20);
+        return inst_8080_illegal(context, 0x20);
     case 0x21:
         return inst_8080_lxi(context, 0x21);
 
@@ -631,7 +638,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_daa(context, 0x27);
 
     case 0x28:
-    return inst_8080_illegal(context, 0x28);
+        return inst_8080_illegal(context, 0x28);
     case 0x29:
         return inst_8080_dad(context, 0x29);
 
@@ -654,7 +661,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_cma(context, 0x2f);
 
     case 0x30:
-    return inst_8080_illegal(context, 0x30);
+        return inst_8080_illegal(context, 0x30);
     case 0x31:
         return inst_8080_lxi(context, 0x31);
 
@@ -677,7 +684,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_stc(context, 0x37);
 
     case 0x38:
-    return inst_8080_illegal(context, 0x38);
+        return inst_8080_illegal(context, 0x38);
     case 0x39:
         return inst_8080_dad(context, 0x39);
 
@@ -1117,7 +1124,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_j(context, 0xca);
 
     case 0xcb:
-    return inst_8080_illegal(context, 0xcb);
+        return inst_8080_illegal(context, 0xcb);
     case 0xcc:
         return inst_8080_c(context, 0xcc);
 
@@ -1158,7 +1165,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_r(context, 0xd8);
 
     case 0xd9:
-    return inst_8080_illegal(context, 0xd9);
+        return inst_8080_illegal(context, 0xd9);
     case 0xda:
         return inst_8080_j(context, 0xda);
 
@@ -1169,7 +1176,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_c(context, 0xdc);
 
     case 0xdd:
-    return inst_8080_illegal(context, 0xdd);
+        return inst_8080_illegal(context, 0xdd);
     case 0xde:
         return inst_8080_sbi(context, 0xde);
 
@@ -1216,7 +1223,7 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_c(context, 0xec);
 
     case 0xed:
-    return inst_8080_illegal(context, 0xed);
+        return inst_8080_illegal(context, 0xed);
     case 0xee:
         return inst_8080_xri(context, 0xee);
 
@@ -1263,20 +1270,21 @@ int emu_8080_execute(struct Context* context){
         return inst_8080_c(context, 0xfc);
 
     case 0xfd:
-    return inst_8080_illegal(context, 0xfd);
+        return inst_8080_illegal(context, 0xfd);
     case 0xfe:
         return inst_8080_cpi(context, 0xfe);
 
     case 0xff:
         return inst_8080_rst(context, 0xff);
-
     }
     return 0;
 }
-void emu_8080_context_init(struct Context *context, const int mem_size){
-    context->memory = (char*)malloc(mem_size);
+void emu_8080_context_init(struct Context *context, const int mem_size)
+{
+    context->memory = (char *)malloc(mem_size);
 }
 
-void emu_8080_context_free(struct Context *context){
+void emu_8080_context_free(struct Context *context)
+{
     free(context->memory);
 }
