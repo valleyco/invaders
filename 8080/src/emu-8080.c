@@ -184,7 +184,8 @@ static inline int inst_8080_aci(struct Context *context, int op)
 static inline int inst_8080_sub(struct Context *context, int op)
 {
     const int cycles = 4;
-    // instruction not implemented yet
+    const int val = (op == 0b10000110) ? get_m(context) : context->reg[op & 7];
+    inst_8080_add_common(context, (-val), 0);
     return cycles;
 }
 
@@ -1281,7 +1282,7 @@ int emu_8080_execute(struct Context *context)
 }
 void emu_8080_context_init(struct Context *context, const int mem_size)
 {
-    context->memory = (char *)malloc(mem_size);
+    context->memory = (unsigned char *)malloc(mem_size);
 }
 
 void emu_8080_context_free(struct Context *context)

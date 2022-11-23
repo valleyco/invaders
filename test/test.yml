@@ -243,3 +243,65 @@
       c: 1
       p: 1
       a: 1
+- name: test adi carry flag and non zero
+  code:
+    - mvi a,255
+    - adi 2
+  expected:
+    registers:
+      a: 1
+    flags:
+      z: 0
+      s: 0
+      c: 1
+      p: 0
+      a: 1
+- name: test adc with carry flag 
+  state:
+    flags:
+      c: 1
+      z: 0
+  code:
+    - mvi a,0
+    - mvi b,1
+    - adc b
+  expected:
+    registers:
+      a: 2
+    flags:
+      z: 0
+      s: 0
+      c: 0
+      p: 0
+      a: 0
+- name: test adc with carry flag off 
+  state:
+    flags:
+      c: 0
+      z: 0
+  code:
+    - mvi a,0
+    - aci 3
+  expected:
+    registers:
+      a: 3
+    flags:
+      z: 0
+      s: 0
+      c: 0
+      p: 1
+      a: 0
+- name: test sub 
+  code:
+    - mvi a,1
+    - mvi b,255
+    - sub b
+  expected:
+    registers:
+      a: 2
+    flags:
+      z: 0
+      s: 0
+      c: 0
+      p: 1
+      a: 0
