@@ -31,7 +31,7 @@ struct Emulator
 {
     struct Context *context;
     int clock_ticks;
-    char memory[16768];
+    unsigned char memory[16768];
     char port[8];
     struct EventQueue event_queue;
     int shift_register;

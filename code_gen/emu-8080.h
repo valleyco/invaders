@@ -38,6 +38,7 @@ struct Context
     int (*port_read)(int p);
     void (*port_write)(int p, int v);
     int address_mask;
+    int M;
 };
 
 void emu_8080_context_init(struct Context *context, const int mem_size);

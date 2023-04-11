@@ -8,13 +8,15 @@
 #include <gtk/gtktypes.h>
 #include "emu.h"
 #include "emu-screen.h"
+#include "utils.h"
 
 // called when window is closed
 
 static GdkPixbuf *pixbuf;
 static GtkImage *screenimage;
 static gint64 emu_cycle_last_run;
-static char image_buffer[8192];
+static unsigned char image_buffer[8192];
+static char app_dir[PATH_MAX];
 
 /*
 static void on_window_main_destroy(GtkWidget *window, GApplication *app)
@@ -64,6 +66,7 @@ static void on_app_activate(GtkApplication *app, GtkBuilder *builder)
 int main(int argc, char *argv[])
 {
     // create new GtkApplication with an unique application ID
+    set_app_folder(argv[0],0);
     GtkApplication *app = gtk_application_new("valleyco.emu.i8080", G_APPLICATION_FLAGS_NONE);
     GtkBuilder *builder = gtk_builder_new();
     struct Emulator *emu = emu_new();

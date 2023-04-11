@@ -4,4 +4,4 @@ lib_LTLIBRARIES = libemu_8080.la
 # -Werror 
 libemu_8080_la_SOURCES = emu-8080.c emu-8080.h
 #-fsanitize=address
-libemu_8080_la_CFLAGS = -shared -fpic -Wall  -Wextra  -Walloc-zero  -Walloca  -static-libasan -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment
+libemu_8080_la_CFLAGS = -shared -fpic -Wall  -Wextra  -Walloc-zero  -Walloca   -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -fno-sanitize=null -fno-sanitize=alignment

@@ -36,7 +36,7 @@ def expected_flags(flags: dict, context: Emu8080Context):
         actual = context.flags[index] != 0
         if (expected != actual):
             raise Exception(
-                f"flag '{flag}' expected: {expected} found: {actual}")            
+                f"flag '{flag}' expected: {expected}, found: {actual}")            
 
 
 def expected_registers(registers: dict, context: Emu8080Context):
@@ -153,6 +153,8 @@ def run_tests(tests: dict, context: Emu8080Context):
                 stk = traceback.extract_tb(tb, 1)
                 fname = stk[0][2]
                 print(f"\t- {msg} in {fname}")
+        finally:
+            print("--------------------------")
     print(f"total: {len(tests)} success: {len(tests)-failCount} failed: {failCount}")
 
 context = Emu8080Context()

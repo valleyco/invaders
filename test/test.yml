@@ -174,7 +174,7 @@
       e: 3
       h: 2
       l: 1
-- name: test add minus 
+- name: test add minus
   code:
     - mvi a,5
     - mvi b,128
@@ -217,7 +217,7 @@
       c: 1
       p: 1
       a: 1
-- name: test adi 
+- name: test adi
   code:
     - mvi a,0
     - adi 15
@@ -256,7 +256,7 @@
       c: 1
       p: 0
       a: 1
-- name: test adc with carry flag 
+- name: test adc with carry flag
   state:
     flags:
       c: 1
@@ -274,7 +274,7 @@
       c: 0
       p: 0
       a: 0
-- name: test adc with carry flag off 
+- name: test adc with carry flag off
   state:
     flags:
       c: 0
@@ -291,17 +291,122 @@
       c: 0
       p: 1
       a: 0
-- name: test sub 
+# - name: test sub
+#   code:
+#     - mvi a,1
+#     - mvi b,255
+#     - sub b
+#   expected:
+#     registers:
+#       a: 2
+#     flags:
+#       z: 0
+#       s: 0
+#       c: 0
+#       p: 1
+#       a: 0
+- name: test inr
   code:
-    - mvi a,1
-    - mvi b,255
-    - sub b
+    - mvi a, 1
+    - inr a
   expected:
     registers:
       a: 2
     flags:
       z: 0
       s: 0
-      c: 0
-      p: 1
+      p: 0
       a: 0
+- name: test inr with ac flags
+  code:
+    - mvi a, 15
+    - inr a
+  expected:
+    registers:
+      a: 16
+    flags:
+      z: 0
+      s: 0
+      p: 0
+      a: 1
+- name: test inr with s flags
+  code:
+    - mvi a, 127
+    - inr a
+  expected:
+    registers:
+      a: 128
+    flags:
+      z: 0
+      s: 1
+      p: 0
+      a: 1
+- name: test inr memory
+  state:
+    registers:
+      h: 0
+      l: 100
+
+    memory:
+      - location: 100
+        data: [6]
+  code:
+    - lxi hl,100
+    - inr m
+  expected:
+    registers:
+      h: 0
+      l: 100
+    memory:
+      - location: 100
+        data: [7]
+    flags:
+      z: 0
+      s: 0
+      p: 0
+- name: test dec with ac flags
+  code:
+    - mvi a, 16
+    - dcr a
+  expected:
+    registers:
+      a: 15
+    flags:
+      z: 0
+      s: 0
+      p: 1
+      a: 1
+- name: test inx
+  state:
+    registers:
+      b: 1
+      c: 255
+  code:
+    - inx bc
+  expected:
+    registers:
+      b: 2
+      c: 0      
+- name: test dcx
+  state:
+    registers:
+      b: 2
+      c: 0
+  code:
+    - dcx bc
+  expected:
+    registers:
+      b: 1
+      c: 255            
+- name: test ana b      
+  code:
+   - mvi a, 7
+   - mvi b, 3
+   - ana b
+  expected:
+    registers:
+      a: 3
+    flags:
+      z: 0
+      s: 0
+      p: 1

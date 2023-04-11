@@ -31,12 +31,14 @@
 #define P_FLAG 2
 #define S_FLAG 3
 #define A_FLAG 4
+typedef int reg8_t;
+typedef int reg16_t;
 
 struct Context
 {
-    int reg[8];
-    int SP;
-    int PC;
+    reg8_t reg[8];
+    reg16_t SP;
+    reg16_t PC;
     int flag[6];
     int halt;
     int interrupt;
@@ -44,6 +46,7 @@ struct Context
     int (*port_read)(int p);
     void (*port_write)(int p, int v);
     int address_mask;
+    reg8_t M;
 };
 
 void emu_8080_context_init(struct Context *context, const int mem_size);

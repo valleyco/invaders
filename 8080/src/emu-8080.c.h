@@ -7,7 +7,8 @@ extern inline int fetch_pc_byte(struct Context *context)
     return context->memory[(context->PC++ & 0xffff)];
 }
 extern inline int fetch_pc_word(struct Context *context)
-{   int word = fetch_pc_byte(context);
+{
+    int word = fetch_pc_byte(context);
     return word + (fetch_pc_byte(context) << 8);
 }
 
@@ -46,13 +47,15 @@ extern inline int is_parity_even(int b)
 // AC is not update here will be implemented in the relevant instruction
 extern inline void update_flags(struct Context *context, int reg, int inc_c)
 {
-    if(inc_c){
-        context->flag[C_FLAG] = (context->reg[reg] & 0xf00) > 0;
+    int val = get_reg_val(context, reg);
+    if (inc_c)
+    {
+        context->flag[C_FLAG] = (val & 0xf00) > 0;
     }
     context->reg[reg] &= 0xff;
-    context->flag[Z_FLAG] = context->reg[reg] == 0;
-    context->flag[P_FLAG] = is_parity_even(context->reg[reg]);
-    context->flag[S_FLAG] = context->reg[reg] & 0x80;
+    context->flag[Z_FLAG] = (val & 0xff) == 0;
+    context->flag[P_FLAG] = is_parity_even(val);
+    context->flag[S_FLAG] = val & 0x80;
 }
 
 extern inline void pack_flags(struct Context *context)
@@ -76,10 +79,31 @@ extern inline void unpack_flags(struct Context *context)
 
 extern inline int get_m(struct Context *context)
 {
-    return context->memory[context->reg[REG_L] + (context->reg[REG_H] << 8)];
+    // int addr = context->reg[REG_L] + (context->reg[REG_H] << 8);
+    // int m = context->M = context->memory[addr];
+    // printf("addr: %i, content: %i\n",addr, m);
+
+    return context->M = context->memory[context->reg[REG_L] + (context->reg[REG_H] << 8)];
 }
 
 extern inline void set_m(struct Context *context, int val)
 {
-    context->memory[context->reg[REG_L] + (context->reg[REG_H] << 8)] = val;
+    context->memory[context->reg[REG_L] + (context->reg[REG_H] << 8)] = (context->M = val);
+}
+
+extern inline int get_reg_val(struct Context *context, int reg)
+{
+    return (reg == REG_M) ? get_m(context) : context->reg[reg];
+}
+
+extern inline void set_reg_val(struct Context *context, int reg, int val)
+{
+    if (reg == REG_M)
+    {
+        set_m(context, val);
+    }
+    else
+    {
+        context->reg[reg] = val;
+    }
 }

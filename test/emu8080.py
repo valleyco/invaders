@@ -38,13 +38,14 @@ flag_map = {
     'S': S_FLAG,
     'A': A_FLAG,
 }
-
+reg8_t = c_int
+reg16_t = c_int
 
 class Emu8080Context(Structure):
     _fields_ = [
-        ("registers", c_int * 8),
-        ("SP", c_int),
-        ("PC", c_int),
+        ("registers", reg8_t * 8),
+        ("SP", reg16_t),
+        ("PC", reg16_t),
         ("flags", c_int * 6),
         ("halt", c_int),
         ("interrupt", c_int),
@@ -52,6 +53,7 @@ class Emu8080Context(Structure):
         ("port_read", CFUNCTYPE(c_int, c_int)),
         ("port_write", CFUNCTYPE(c_int, c_int, c_int)),
         ('address_mask', c_int),
+        ('M', reg8_t),
     ]
 
     def __init__(self):
@@ -59,8 +61,8 @@ class Emu8080Context(Structure):
         self.memory = pointer(create_string_buffer(32768))
 
     def print(self):
-        print("REG: a  b  c  d  e  h  l  pc   sp     Z C P S A")
-        print("     {0:02x} {1:02x} {2:02x} {3:02x} {4:02x} {5:02x} {6:02x} {7:04x} {8:04x}   {9:1} {10:1} {11:1} {12:1} {13:1}".format(
+        print("REG: a  b  c  d  e  h  l  M  pc   sp     Z C P S A")
+        print("     {0:02x} {1:02x} {2:02x} {3:02x} {4:02x} {5:02x} {6:02x} {7:02x} {8:04x} {9:04x}   {10:1} {11:1} {12:1} {13:1} {14:1}".format(
             self.registers[REG_A],
             self.registers[REG_B],
             self.registers[REG_C],
@@ -68,6 +70,8 @@ class Emu8080Context(Structure):
             self.registers[REG_E],
             self.registers[REG_H],
             self.registers[REG_L],
+            ord(self.memory.contents[self.registers[REG_L] +
+                (self.registers[REG_H] * 256)]),
             self.PC,
             self.SP,
             self.flags[Z_FLAG] != 0,

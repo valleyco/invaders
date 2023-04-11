@@ -1,8 +1,10 @@
 .vscode
+.DS_Store
 code_gen/*.yml
 m4
 aclocal.m4
 .deps
+configure
 /config
 /autom4te.cache/
 /nbproject/
@@ -27,3 +29,4 @@ null.d
 code_gen/emu-8080.c
 .libs
 __pycache__
+.venv

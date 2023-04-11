@@ -8,18 +8,9 @@
 static inline int inst_8080_mov(struct Context *context, int op)
 {
     const int cycles = 5;
-    if ((op & 7) == REG_M)
-    {
-        context->reg[(op >> 3) & 7] = get_m(context);
-    }
-    else if ((op & 070) == REG_M << 3)
-    {
-        set_m(context, context->reg[op & 7]);
-    }
-    else
-    {
-        context->reg[(op >> 3) & 7] = context->reg[op & 7];
-    }
+    const r_src = op & 7;
+    const r_dest = (op >> 3) & 7;
+    set_reg_val(context, r_dest, get_reg_val(context, r_src));
     return cycles;
 }
 
@@ -213,18 +204,12 @@ static inline int inst_8080_sbi(struct Context *context, int op)
 static inline int inst_8080_inr(struct Context *context, int op)
 {
     const int cycles = 5;
-    const int reg = op >> 3;
-    int val = (op == 0b00110100) ? val = get_m(context) : context->reg[reg];
+    const int reg = (op >> 3) & 0x07;
+    int val = get_reg_val(context, reg);
+    // printf("reg %i, value: %i\n",reg, val);
     context->flag[A_FLAG] = (val & 0xf) == 0xf ? 1 : 0;
     val++;
-    if (op == 0b00110100)
-    {
-        set_m(context, val);
-    }
-    else
-    {
-        context->reg[reg] = val;
-    }
+    set_reg_val(context, reg, val);
     update_flags(context, reg, 0);
     return cycles;
 }
@@ -232,18 +217,11 @@ static inline int inst_8080_inr(struct Context *context, int op)
 static inline int inst_8080_dcr(struct Context *context, int op)
 {
     const int cycles = 5;
-    const int reg = op >> 3;
-    int val = (op == 0b00110101) ? val = get_m(context) : context->reg[reg];
+    const int reg = (op >> 3) & 0x07;
+    int val = get_reg_val(context, reg);
     context->flag[A_FLAG] = (val & 0xf) == 0x0 ? 1 : 0;
     val--;
-    if (op == 0b00110101)
-    {
-        set_m(context, val);
-    }
-    else
-    {
-        context->reg[op >> 3] = val;
-    }
+    set_reg_val(context, reg, val);
     update_flags(context, reg, 0);
     return cycles;
 }
@@ -251,70 +229,165 @@ static inline int inst_8080_dcr(struct Context *context, int op)
 static inline int inst_8080_inx(struct Context *context, int op)
 {
     const int cycles = 5;
-    // instruction not implemented yet
+    int val;
+    switch (op & 0x30)
+    {
+    case RP_BC:
+        val = context->reg[REG_C] + (context->reg[REG_B] << 8) + 1;
+        context->reg[REG_C] = val & 0xff;
+        context->reg[REG_B] = val >> 8;
+        break;
+    case RP_DE:
+        val = context->reg[REG_E] + (context->reg[REG_D] << 8) + 1;
+        context->reg[REG_E] = val & 0xff;
+        context->reg[REG_D] = val >> 8;
+        break;
+    case RP_HL:
+        val = context->reg[REG_L] + (context->reg[REG_H] << 8) + 1;
+        context->reg[REG_L] = val & 0xff;
+        context->reg[REG_H] = val >> 8;
+        break;
+    case RP_SP:
+        context->SP++;
+        break;
+    }
     return cycles;
 }
 
 static inline int inst_8080_dcx(struct Context *context, int op)
 {
     const int cycles = 5;
-    // instruction not implemented yet
+    int val;
+    switch (op & 0x30)
+    {
+    case RP_BC:
+        val = context->reg[REG_C] + (context->reg[REG_B] << 8) - 1;
+        context->reg[REG_C] = val & 0xff;
+        context->reg[REG_B] = val >> 8;
+        break;
+    case RP_DE:
+        val = context->reg[REG_E] + (context->reg[REG_D] << 8) - 1;
+        context->reg[REG_E] = val & 0xff;
+        context->reg[REG_D] = val >> 8;
+        break;
+    case RP_HL:
+        val = context->reg[REG_L] + (context->reg[REG_H] << 8) - 1;
+        context->reg[REG_L] = val & 0xff;
+        context->reg[REG_H] = val >> 8;
+        break;
+    case RP_SP:
+        context->SP--;
+        break;
+    }
     return cycles;
 }
 
 static inline int inst_8080_dad(struct Context *context, int op)
 {
     const int cycles = 10;
-    // instruction not implemented yet
+    int val = context->reg[REG_L] + (context->reg[REG_H] << 8);
+    switch (op & 0x30)
+    {
+    case RP_BC:
+        val += context->reg[REG_C] + (context->reg[REG_B] << 8);
+        break;
+    case RP_DE:
+        val += context->reg[REG_E] + (context->reg[REG_D] << 8);
+        break;
+    case RP_HL:
+        val = context->reg[REG_L] + (context->reg[REG_H] << 8);
+        break;
+    case RP_SP:
+        val += context->SP;
+        break;
+    }
+    context->reg[REG_L] = val & 0xff;
+    context->reg[REG_H] = (val >> 8) & 0xff;
+    context->flag[C_FLAG] = (val & 0xf0000) ? 1 : 0;
     return cycles;
 }
 
 static inline int inst_8080_daa(struct Context *context, int op)
 {
     const int cycles = 4;
-    // instruction not implemented yet
+    int a = context->reg[REG_A];
+    if ((a & 0x0f) > 9 || context->flag[A_FLAG])
+    {
+        a += 6;
+    }
+    if (((a >> 4) & 0x0f) > 9 || context->flag[C_FLAG])
+    {
+        a += (6 << 4);
+    }
+    context->reg[REG_A] = a;
+    update_flags(context, REG_A, 1);
+
     return cycles;
 }
 
 static inline int inst_8080_ana(struct Context *context, int op)
 {
     const int cycles = 4;
-    // instruction not implemented yet
+    const int reg = op & 0x07;
+    // TODO: A_FLAG
+    int val = get_reg_val(context, reg);
+    context->reg[REG_A] &= val;
+    update_flags(context, REG_A, 0);
     return cycles;
 }
 
 static inline int inst_8080_ani(struct Context *context, int op)
 {
     const int cycles = 7;
-    // instruction not implemented yet
+    int val = fetch_pc_byte(context);
+    // TODO: A_FLAG
+    context->flag[A_FLAG] = ((context->reg[REG_A] & 0x08) | (val & 0x08)) > 0;
+    context->reg[REG_A] &= val;
+    update_flags(context, REG_A, 0);
     return cycles;
 }
 
 static inline int inst_8080_ora(struct Context *context, int op)
 {
     const int cycles = 4;
-    // instruction not implemented yet
+    const int reg = op & 0x07;
+    // TODO: A_FLAG
+    int val = get_reg_val(context, reg);
+    context->reg[REG_A] |= val;
+    update_flags(context, REG_A, 0);
     return cycles;
 }
 
 static inline int inst_8080_ori(struct Context *context, int op)
 {
     const int cycles = 7;
-    // instruction not implemented yet
+    int val = fetch_pc_byte(context);
+    // TODO: A_FLAG
+    context->flag[A_FLAG] = ((context->reg[REG_A] & 0x08) | (val & 0x08)) > 0;
+    context->reg[REG_A] |= val;
+    update_flags(context, REG_A, 0);
     return cycles;
 }
 
 static inline int inst_8080_xra(struct Context *context, int op)
 {
     const int cycles = 4;
-    // instruction not implemented yet
+    const int reg = op & 0x07;
+    // TODO: A_FLAG
+    int val = get_reg_val(context, reg);
+    context->reg[REG_A] ^= val;
+    update_flags(context, REG_A, 0);
     return cycles;
 }
 
 static inline int inst_8080_xri(struct Context *context, int op)
 {
     const int cycles = 7;
-    // instruction not implemented yet
+    int val = fetch_pc_byte(context);
+    // TODO: A_FLAG
+    context->flag[A_FLAG] = ((context->reg[REG_A] & 0x08) | (val & 0x08)) > 0;
+    context->reg[REG_A] ^= val;
+    update_flags(context, REG_A, 0);
     return cycles;
 }
 
