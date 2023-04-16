@@ -7,8 +7,8 @@
 #define REG_H 4
 #define REG_L 5
 // will not be used as index
-#define REG_M 6 
-#define REG_FLAG  6
+#define REG_M 6
+#define REG_FLAG 6
 #define REG_A 7
 
 #define RP_BC 0x00
@@ -31,7 +31,17 @@
 #define P_FLAG 2
 #define S_FLAG 3
 #define A_FLAG 4
-typedef int reg8_t;
+
+#define C_NZ 0
+#define C_Z 1
+#define C_NC 2
+#define C_C 3
+#define C_PO 4
+#define C_PE 5
+#define C_P 6
+#define C_M 7
+
+typedef unsigned char reg8_t;
 typedef int reg16_t;
 
 struct Context
@@ -42,17 +52,13 @@ struct Context
     int flag[6];
     int halt;
     int interrupt;
-    unsigned char* memory;
+    unsigned char *memory;
     int (*port_read)(int p);
     void (*port_write)(int p, int v);
     int address_mask;
     reg8_t M;
 };
 
-void emu_8080_context_init(struct Context *context, const int mem_size);
+int emu_8080_rst(struct Context *context, int n);
 
-void emu_8080_context_free(struct Context* context);
-
-int emu_8080_rst(struct Context* context,int n);
-
-int emu_8080_execute(struct Context* context);
+int emu_8080_execute(struct Context *context);

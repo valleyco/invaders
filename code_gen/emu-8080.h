@@ -10,6 +10,12 @@
 #define REG_M 6 
 #define REG_FLAG  6
 #define REG_A 7
+
+#define RP_BC 0x00
+#define RP_DE 0x10
+#define RP_HL 0x20
+#define RP_SP 0x30
+
 /*
 0 C: Carry flag; set to carry out of bit 7 in result
 1 V: Undocumented signed overflow flag* (8085 only, on 8080 bit is always 1 in PSW)
@@ -26,19 +32,31 @@
 #define S_FLAG 3
 #define A_FLAG 4
 
+#define C_NZ 0
+#define C_Z  1
+#define C_NC 2 
+#define C_C  3
+#define C_PO 4
+#define C_PE 5
+#define C_P  6
+#define C_M  7
+
+typedef unsigned char reg8_t;
+typedef int reg16_t;
+
 struct Context
 {
-    int reg[8];
-    int SP;
-    int PC;
+    reg8_t reg[8];
+    reg16_t SP;
+    reg16_t PC;
     int flag[6];
     int halt;
     int interrupt;
-    char* memory;
+    unsigned char* memory;
     int (*port_read)(int p);
     void (*port_write)(int p, int v);
     int address_mask;
-    int M;
+    reg8_t M;
 };
 
 void emu_8080_context_init(struct Context *context, const int mem_size);

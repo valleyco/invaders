@@ -32,9 +32,9 @@ static void on_window_main_destroy(GtkWidget *window, GApplication *app)
 static gboolean emulation_update(gpointer user_data)
 {
     struct Emulator *em = (struct Emulator *)user_data;
-    update_pixbuffer(em, pixbuf);
-    gtk_image_set_from_pixbuf(screenimage, pixbuf);
-    return TRUE;
+    //update_pixbuffer(em, pixbuf);
+    //gtk_image_set_from_pixbuf(screenimage, pixbuf);
+    //return TRUE;
     gint64 now = g_get_monotonic_time();
     gint64 diff = (now - emu_cycle_last_run) / 1000; // find how much time we need to cover in miliseconds
     int cycles = (CPU_8080_HZ * diff) / 1000;
@@ -45,7 +45,7 @@ static gboolean emulation_update(gpointer user_data)
     emu_cycle_last_run = now;
     // update the screen
     update_pixbuffer(em, pixbuf);
-    gtk_image_set_from_pixbuf(screenimage, pixbuf);
+    //gtk_image_set_from_pixbuf(screenimage, pixbuf);
 
     printf("time elapsed %li, %i           \r", diff, cycles);
     return TRUE;
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 
     pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, 256, 224);
     load_invaders(image_buffer);
-    do_update_buffer(image_buffer, pixbuf);
+    //do_update_buffer(image_buffer, pixbuf);
 
     // start the application, terminate by closing the window
     // GtkApplication* is upcast to GApplication* with G_APPLICATION() macro

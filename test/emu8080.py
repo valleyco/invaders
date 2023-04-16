@@ -38,7 +38,8 @@ flag_map = {
     'S': S_FLAG,
     'A': A_FLAG,
 }
-reg8_t = c_int
+
+reg8_t = c_ubyte
 reg16_t = c_int
 
 class Emu8080Context(Structure):

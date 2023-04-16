@@ -2,13 +2,21 @@
 #include "emu-8080.h"
 #include "emu.h"
 #include "emu-screen.h"
+static int port_read(int p){
+    return 0;
+}
+static void port_write(int p, int v){
 
+}
 struct Emulator *emu_new()
 {
     struct Emulator *emulator = (struct Emulator *)malloc(sizeof(struct Emulator));
     emulator->context = (struct Context *)malloc(sizeof(struct Context));
     emulator->clock_ticks = 0;
     emulator->context->memory = emulator->memory;
+    emulator->context->port_read = port_read;
+    emulator->context->port_write = port_write;
+    emulator->context->PC = 0;
     emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
     emulator->shift_register = 0;
     emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;

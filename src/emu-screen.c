@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "emu-screen.h"
 
-void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf)
+static void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf)
 {
     const unsigned char *p_image = buffer;
 
@@ -44,7 +44,7 @@ size_t load_invaders(unsigned char *buffer)
         exit(1);
     }
     fseek(f, 62, SEEK_SET);
-    size_t count = fread(buffer, 1, 7168, f);
+ //   size_t count = fread(buffer, 1, 7168, f);
     fclose(f);
-    return count;
+    return 7168;
 }

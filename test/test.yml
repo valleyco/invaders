@@ -410,3 +410,19 @@
       z: 0
       s: 0
       p: 1
+- name: test call/ret
+  state:
+    registers:
+      sp : 64
+  code:
+    - call 4
+    - nop
+    - ret
+  expected:
+    registers:
+      pc: 3
+      sp : 100
+    memory:
+      - location: 62
+        data: [3,0]
+    

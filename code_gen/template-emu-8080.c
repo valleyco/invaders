@@ -34,10 +34,3 @@ int emu_8080_execute(struct Context* context){
     }
     return 0;
 }
-void emu_8080_context_init(struct Context *context, const int mem_size){
-    context->memory = (unsigned char*)malloc(mem_size);
-}
-
-void emu_8080_context_free(struct Context *context){
-    free(context->memory);
-}
