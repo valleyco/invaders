@@ -13,7 +13,7 @@ extern inline reg16_t get_mem_word(struct Context *context, int addr)
     return context->memory[addr] | (context->memory[addr + 1] << 8);
 }
 
-extern inline int fetch_pc_byte(struct Context *context)
+extern inline reg8_t fetch_pc_byte(struct Context *context)
 {
     int pc = context->PC;
     context->PC = (context->PC + 1) & 0xffff;
@@ -21,9 +21,9 @@ extern inline int fetch_pc_byte(struct Context *context)
     return context->memory[pc];
 }
 
-extern inline int fetch_pc_word(struct Context *context)
+extern inline reg16_t fetch_pc_word(struct Context *context)
 {
-    int word = fetch_pc_byte(context);
+    reg8_t word = fetch_pc_byte(context);
     return word | (fetch_pc_byte(context) << 8);
 }
 

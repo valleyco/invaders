@@ -52,7 +52,7 @@ struct Context
     int flag[6];
     int halt;
     int interrupt;
-    unsigned char *memory;
+    reg8_t *memory;
     int (*port_read)(int p);
     void (*port_write)(int p, int v);
     int address_mask;

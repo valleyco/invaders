@@ -93,8 +93,6 @@
   state:
     memory:
       - location: 100
-        data: [0, 1]
-      - location: 0x100
         data: [1, 2]
   code:
     - lhld 100
@@ -107,14 +105,14 @@
   state:
     memory:
       - location: 100
-        data: [0, 1]
+        data: [1, 0]
   code:
-    - lxi hl,513
+    - lxi hl, 256
     - shld 100
   expected:
     memory:
-      - location: 256
-        data: [1, 2]
+      - location: 100
+        data: [0, 1]
 - name: test ldax bc
   state:
     memory:
@@ -386,7 +384,7 @@
   expected:
     registers:
       b: 2
-      c: 0      
+      c: 0
 - name: test dcx
   state:
     registers:
@@ -397,12 +395,12 @@
   expected:
     registers:
       b: 1
-      c: 255            
-- name: test ana b      
+      c: 255
+- name: test ana b
   code:
-   - mvi a, 7
-   - mvi b, 3
-   - ana b
+    - mvi a, 7
+    - mvi b, 3
+    - ana b
   expected:
     registers:
       a: 3
@@ -410,19 +408,71 @@
       z: 0
       s: 0
       p: 1
-- name: test call/ret
-  state:
-    registers:
-      sp : 64
+- name: test sub
+
   code:
-    - call 4
-    - nop
-    - ret
+    - mvi a,4
+    - sui 5
   expected:
     registers:
-      pc: 3
-      sp : 100
+      a: 255
+    flags:
+      c: 1
+      p: 1
+      z: 0
+
+- name: test sub
+
+  code:
+    - mvi a,5
+    - sui 4
+  expected:
+    registers:
+      a: 1
+    flags:
+      c: 0
+      p: 0
+      z: 0
+
+- name: test sub
+
+  code:
+    - mvi a,128
+    - sui 5
+  expected:
+    registers:
+      a: 123
+    flags:
+      c: 0
+
+- name: test sbi
+  state:
+    flags:
+      c: 1
+  code:
+    - mvi a,5
+    - sbi 4
+  expected:
+    registers:
+      a: 0
+    flags:
+      c: 0
+      p: 1
+      z: 1
+- name: array sum
+  state:
     memory:
-      - location: 62
-        data: [3,0]
-    
+      - location: 12
+        data : [0x10 ,0x20 ,0x30 ,0x10 ,0x20]
+  code:
+    - mvi d, 0
+    - lxi bc, 12
+    - ldax bc
+    - cpi 0
+    - jz 11
+    - add d
+    - mov d,a
+    - inr c
+    - jmp 5  
+  expected:
+    d: 144  

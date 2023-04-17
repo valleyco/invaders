@@ -17,14 +17,15 @@ static inline int inst_8080_mov(struct Context *context, int op)
 static inline int inst_8080_mvi(struct Context *context, int op)
 {
     const int cycles = 7;
+    const int b = fetch_pc_byte(context);
     if (op == 0b00110110)
     {
-        set_m_reg(context, fetch_pc_byte(context));
+        set_m_reg(context, b);
         return cycles + 3;
     }
     else
     {
-        context->reg[op >> 3] = fetch_pc_byte(context);
+        context->reg[op >> 3] = b;
         return cycles;
     }
 }
@@ -71,7 +72,7 @@ static inline int inst_8080_lhld(struct Context *context, int op)
 {
     const int cycles = 16;
     int addr = fetch_pc_word(context);
-    addr = context->memory[addr] + (context->memory[addr + 1] << 8);
+    //addr = get_mem_word(addr);
     context->reg[REG_L] = context->memory[addr];
     context->reg[REG_H] = context->memory[addr + 1];
     return cycles;
@@ -81,7 +82,7 @@ static inline int inst_8080_shld(struct Context *context, int op)
 {
     const int cycles = 16;
     int addr = fetch_pc_word(context);
-    addr = context->memory[addr] + (context->memory[addr + 1] << 8);
+    //addr = context->memory[addr] + (context->memory[addr + 1] << 8);
     context->memory[addr] = context->reg[REG_L];
     context->memory[addr + 1] = context->reg[REG_H];
     return cycles;
@@ -179,6 +180,7 @@ static inline int inst_8080_sub(struct Context *context, int op)
     const int cycles = 4;
     const int val = get_reg_val(context, op & 7);
     inst_8080_add_common(context, (-val) & 0xff, 0);
+    context->flag[C_FLAG] = ! context->flag[C_FLAG];
     return cycles;
 }
 
@@ -187,6 +189,8 @@ static inline int inst_8080_sui(struct Context *context, int op)
     const int cycles = 7;
     const int val = fetch_pc_byte(context);
     inst_8080_add_common(context, (-val) & 0xff, 0);
+    context->flag[C_FLAG] = ! context->flag[C_FLAG];
+
     return cycles;
 }
 
@@ -195,6 +199,7 @@ static inline int inst_8080_sbb(struct Context *context, int op)
     const int cycles = 4;
     const int val = get_reg_val(context, op & 7) + context->flag[C_FLAG];
     inst_8080_add_common(context, (-val) & 0xff, 0);
+    context->flag[C_FLAG] = ! context->flag[C_FLAG];
     return cycles;
 }
 
@@ -203,6 +208,7 @@ static inline int inst_8080_sbi(struct Context *context, int op)
     const int cycles = 7;
     const int val = fetch_pc_byte(context) + context->flag[C_FLAG];
     inst_8080_add_common(context, (-val) & 0xff, 0);
+    context->flag[C_FLAG] = ! context->flag[C_FLAG];
     return cycles;
 }
 
@@ -212,7 +218,7 @@ static inline int inst_8080_inr(struct Context *context, int op)
     const int reg = (op >> 3) & 0x07;
     int val = get_reg_val(context, reg);
     // printf("reg %i, value: %i\n",reg, val);
-    context->flag[A_FLAG] = (val & 0xf) == 0xf ? 1 : 0;
+    context->flag[A_FLAG] = (val & 0x0f) == 0x0f ? 1 : 0;
     val++;
     set_reg_val(context, reg, val);
     update_flags(context, val, 0);
@@ -224,7 +230,7 @@ static inline int inst_8080_dcr(struct Context *context, int op)
     const int cycles = 5;
     const int reg = (op >> 3) & 0x07;
     int val = get_reg_val(context, reg);
-    context->flag[A_FLAG] = (val & 0xf) == 0x0 ? 1 : 0;
+    context->flag[A_FLAG] = (val & 0x0f) == 0x00 ? 1 : 0;
     val--;
     set_reg_val(context, reg, val);
     update_flags(context, val, 0);
@@ -308,7 +314,7 @@ static inline int inst_8080_dad(struct Context *context, int op)
     }
     context->reg[REG_L] = val & 0xff;
     context->reg[REG_H] = (val >> 8) & 0xff;
-    context->flag[C_FLAG] = (val & 0xf0000) ? 1 : 0;
+    context->flag[C_FLAG] = val >> 16;
     return cycles;
 }
 
@@ -389,7 +395,7 @@ static inline int inst_8080_xri(struct Context *context, int op)
 {
     const int cycles = 7;
     int val = context->reg[REG_A] ^ fetch_pc_byte(context);
-    context->reg[REG_A] = val;
+    context->reg[REG_A] ^= val;
     update_flags(context, val, 0);
     context->flag[C_FLAG] = 0;
     context->flag[A_FLAG] = 0;

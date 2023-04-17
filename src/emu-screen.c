@@ -14,13 +14,13 @@ static void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf)
     {
         for (int c = 0; c < (SCREEN_WIDTH / 8); c++)
         {
-            for (int b = 0x80; b; b >>= 1)
-            //            for (int b = 1; b < 0x100; b <<= 1)
+            //for (int b = 0x80; b; b >>= 1)
+            for (int b = 1; b < 0x100; b <<= 1)
             {
                 int pixel = (*p_image & b) ? 255 : 0;
                 for (int s = 0; s < pixbuf_n_channels; s++)
                 {
-                    *pixbuf_pixels = pixel;
+                 //   *pixbuf_pixels = pixel;
                     pixbuf_pixels++;
                 }
             }

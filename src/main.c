@@ -45,7 +45,7 @@ static gboolean emulation_update(gpointer user_data)
     emu_cycle_last_run = now;
     // update the screen
     update_pixbuffer(em, pixbuf);
-    //gtk_image_set_from_pixbuf(screenimage, pixbuf);
+    gtk_image_set_from_pixbuf(screenimage, pixbuf);
 
     printf("time elapsed %li, %i           \r", diff, cycles);
     return TRUE;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
     g_signal_connect(app, "activate", G_CALLBACK(on_app_activate), builder);
 
-    pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, 256, 224);
+    pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_WIDTH, SCREEN_HEIGHT);
     load_invaders(image_buffer);
     //do_update_buffer(image_buffer, pixbuf);
 
