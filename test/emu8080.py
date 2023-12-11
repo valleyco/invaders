@@ -43,6 +43,7 @@ reg8_t = c_ubyte
 reg16_t = c_int
 
 class Emu8080Context(Structure):
+    """interface to the C structure"""
     _fields_ = [
         ("registers", reg8_t * 8),
         ("SP", reg16_t),

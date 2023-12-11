@@ -8,11 +8,15 @@ from asm import asm
 from emu8080 import Emu8080Context, flag_map, reg_map, emu8080
 
 
+class TestException(Exception):
+    """Text specific exception"""
+
+
 def expected_memory_location(location: int, data: list, context: Emu8080Context):
     for i, expected in enumerate(data):
         actual = ord(context.memory.contents[location + i])
-        if (expected != actual):
-            raise Exception(
+        if expected != actual:
+            raise TestException(
                 f"memory location {location + i} expected: {expected} found: {actual}")
 
 
@@ -26,8 +30,8 @@ def expected_flags(flags: dict, context: Emu8080Context):
         index = flag_map[flag.upper()]
         expected = flags[flag] != 0
         actual = context.flags[index] != 0
-        if (expected != actual):
-            raise Exception(
+        if expected != actual:
+            raise TestException(
                 f"flag '{flag}' expected: {expected}, found: {actual}")
 
 
@@ -40,8 +44,8 @@ def expected_registers(registers: dict, context: Emu8080Context):
         else:
             actual = context.registers[reg_map[reg]]
         expected = registers[reg]
-        if (expected != actual):
-            raise Exception(
+        if expected != actual:
+            raise TestException(
                 f"register '{reg}' expected: {expected} found: {actual}")
 
 
@@ -85,7 +89,6 @@ def test_init_state(state: dict, context: Emu8080Context):
         test_init_memory(state['memory'], context)
     if 'flags' in state:
         test_init_flags(state['flags'], context)
-    # context.print()
 
 
 def test_reset_state(context: Emu8080Context):
@@ -102,9 +105,10 @@ def asm_code(instructions: list) -> list:
     for line in instructions:
         code = asm(line)
         if len(code) == 0:
-            raise Exception("invalid instruction: {0} {1}".format(
+            raise TestException("invalid instruction: {0} {1}".format(
                 line, sys._getframe().f_code.co_name))
         buffer += code
+    buffer += [0b01110110]  # HLT
     return buffer
 
 
@@ -114,12 +118,15 @@ def run_test_code(instructions: list, context: Emu8080Context):
     for i, b in enumerate(code):
         context.memory.contents[i] = b
     print(instructions)
-    for i in range(0, len(instructions)):
+    max_loops = 1000
+    while max_loops > 0 and context.halt == 0:
         context.print()
+        max_loops -= 1
         emu8080.emu_8080_execute(byref(context))
 
 
 def run_test(test, context: Emu8080Context):
+    context.halt = 0
     if (not 'reset' in test) or test['reset']:
         test_reset_state(context)
     if 'state' in test:
@@ -136,7 +143,7 @@ def run_tests(tests: dict, context: Emu8080Context):
             run_test(test, context)
             print(f"success : '{test['name']}'")
 
-        except Exception as ex:
+        except TestException as ex:
             fail_count += 1
             print(f"failed : '{test['name']}'")
             context.print()
@@ -150,6 +157,7 @@ def run_tests(tests: dict, context: Emu8080Context):
             print("--------------------------")
     print(
         f"total: {len(tests)} success: {len(tests)-fail_count} failed: {fail_count}")
+
 
 def execute():
     current_dir = os.path.dirname(__file__)
@@ -165,6 +173,7 @@ def execute():
     context = Emu8080Context()
 
     run_tests(tests, context)
+
 
 if __name__ == '__main__':
     execute()
