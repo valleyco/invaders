@@ -63,6 +63,7 @@ class Emu8080Context(Structure):
         self.memory = pointer(create_string_buffer(32768))
 
     def print(self):
+        m_addr = self.registers[REG_L] + (self.registers[REG_H] * 256)
         print("REG: a  b  c  d  e  h  l  M  pc   sp     Z C P S A")
         print("     {0:02x} {1:02x} {2:02x} {3:02x} {4:02x} {5:02x} {6:02x} {7:02x} {8:04x} {9:04x}   {10:1} {11:1} {12:1} {13:1} {14:1}".format(
             self.registers[REG_A],
@@ -72,8 +73,7 @@ class Emu8080Context(Structure):
             self.registers[REG_E],
             self.registers[REG_H],
             self.registers[REG_L],
-            ord(self.memory.contents[self.registers[REG_L] +
-                (self.registers[REG_H] * 256)]),
+            ord(self.memory.contents[m_addr]) if m_addr < 32768 else 0,
             self.PC,
             self.SP,
             self.flags[Z_FLAG] != 0,

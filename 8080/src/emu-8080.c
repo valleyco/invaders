@@ -477,7 +477,7 @@ static inline int inst_8080_cma(struct Context *context, int op)
 static inline int inst_8080_cmc(struct Context *context, int op)
 {
     const int cycles = 4;
-    context->flag[C_FLAG] = !context->flag[C_FLAG];
+    context->flag[C_FLAG] = 1 - context->flag[C_FLAG];
     return cycles;
 }
 

@@ -439,6 +439,17 @@
     registers:
       b: 1
       c: 255
+- name: test DAD
+  code:
+    - lxi bc, 33025
+    - lxi hl, 33025
+    - dad bc
+  expected:
+    registers:
+      h: 2
+      l: 2
+    flags:
+      c: 1
 - name: test ana b
   code:
     - mvi a, 7
@@ -451,6 +462,40 @@
       z: 0
       s: 0
       p: 1
+- name: test ani 3
+  code:
+    - mvi a, 7
+    - ani 3
+  expected:
+    registers:
+      a: 3
+    flags:
+      z: 0
+      s: 0
+      p: 1
+- name: test push pop
+  code:
+    - mvi a,1
+    - mvi b,2
+    - mvi c,3
+    - mvi d,4
+    - mvi e,5
+    - mvi h,6
+    - mvi l,7
+    - push hl
+    - push de
+    - push bc
+    - pop hl
+    - pop bc
+    - pop de
+  expected:
+    registers:
+      b: 4
+      c: 5
+      d: 6
+      e: 7
+      h: 2
+      l: 3
 - name: test call/ret
   state:
     registers:

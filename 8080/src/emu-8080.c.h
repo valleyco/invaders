@@ -137,8 +137,8 @@ extern inline void set_rp_val(struct Context *context, int rp, reg16_t val)
         break;
 
     case RP_HL:
-        context->reg[REG_H] = val & 0xff;
-        context->reg[REG_L] = (val >> 8) & 0xff;
+        context->reg[REG_L] = val & 0xff;
+        context->reg[REG_H] = (val >> 8) & 0xff;
         break;
 
     case RP_SP:
