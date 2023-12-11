@@ -10,7 +10,7 @@ void port_write(struct Emulator *emu, int p, int v)
     switch (p)
     {
     case 2:
-        emu->port[3] = ((emu->shift_register << v) & 0xff00) >> 8;
+        emu->port[3] = emu->shift_register >> (8-v) ;
         break;
     case 3: // sound - not implemented
         break;

@@ -68,7 +68,8 @@ int main(int argc, char *argv[])
 
     g_signal_connect(app, "activate", G_CALLBACK(on_app_activate), builder);
 
-    pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, 256, 224);
+    pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_WIDTH, SCREEN_HEIGHT);
+    //pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_HEIGHT, SCREEN_WIDTH);
 
     // start the application, terminate by closing the window
     // GtkApplication* is upcast to GApplication* with G_APPLICATION() macro
