@@ -386,7 +386,7 @@
   expected:
     registers:
       b: 2
-      c: 0      
+      c: 0
 - name: test dcx
   state:
     registers:
@@ -397,12 +397,12 @@
   expected:
     registers:
       b: 1
-      c: 255            
-- name: test ana b      
+      c: 255
+- name: test ana b
   code:
-   - mvi a, 7
-   - mvi b, 3
-   - ana b
+    - mvi a, 7
+    - mvi b, 3
+    - ana b
   expected:
     registers:
       a: 3
@@ -413,16 +413,16 @@
 - name: test call/ret
   state:
     registers:
-      sp : 64
+      sp: 64
   code:
-    - call 4
+    - call 5
+    - hlt
     - nop
     - ret
   expected:
     registers:
-      pc: 3
-      sp : 100
+      pc: 4
+      sp: 64
     memory:
       - location: 62
-        data: [3,0]
-    
+        data: [3, 0]

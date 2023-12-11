@@ -28,7 +28,7 @@ reg_map = {
     'e': REG_E,
     'h': REG_H,
     'l': REG_L,
-    'm': REG_A,
+    'm': REG_M,
 }
 
 flag_map = {
