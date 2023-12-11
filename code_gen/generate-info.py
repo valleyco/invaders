@@ -1,8 +1,10 @@
 #!/usr/bin/python3
-import yaml,os,re
+import os
+import sys
+import re
+import yaml
 
-
-opcodes = [None] * 256
+opcodes = [{}] * 256
 for i in range(256):
     opcodes[i] = {'name': "---", 'code': i}
 
@@ -40,7 +42,7 @@ CYCLES = [
 def get_opcode_mask(code):
     i = 0
     for ch in code:
-        i = (i << 1)
+        i = i << 1
         if ch == '1':
             i |= 1
     return i
@@ -263,7 +265,7 @@ def expand_inst(m):
         opcode = expand_none(m)
     else:
         print(m)
-        exit(1)
+        sys.exit(1)
     for op in opcode:
         opcodes[op['code']] = op
 
@@ -276,26 +278,28 @@ def get_instruction_info(m):
         'cycles': CYCLES[code]
     }
 
-current_dir = os.path.dirname(__file__)
 
-my_file = open(current_dir + "/instruction_codes.txt", "r")
-content_list = my_file.read()
-regex = re.compile(INST_REGEX)
-matches = regex.findall(content_list)
+if __name__ == '__main__':
+    current_dir = os.path.dirname(__file__)
 
+    my_file = open(f'{current_dir}/instruction_codes.txt',
+                   'r', encoding='utf-8')
+    content_list = my_file.read()
+    inst_regex = re.compile(INST_REGEX)
+    matches = inst_regex.findall(content_list)
 
-for m in matches:
-#    print(m)
-    expand_inst(m)
-# for inst in opcodes:
-#    print(inst)
+    for m in matches:
+        #    print(m)
+        expand_inst(m)
+    # for inst in opcodes:
+    #    print(inst)
 
-instructions = []
-for m in matches:
-    instructions.append(get_instruction_info(m))
+    instructions = []
+    for m in matches:
+        instructions.append(get_instruction_info(m))
 
-with open(current_dir + r'/instructions.yaml', 'w') as file:
-    documents = yaml.dump(instructions, file)
+    with open( f'{current_dir}/instructions.yaml', 'w', encoding='utf-8') as file:
+        documents = yaml.dump(instructions, file)
 
-with open(current_dir + r'/opcodes.yaml', 'w') as file:
-    documents = yaml.dump(opcodes, file)
+    with open(current_dir + f'{current_dir}/opcodes.yaml', 'w', encoding='utf-8') as file:
+        documents = yaml.dump(opcodes, file)

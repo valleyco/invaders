@@ -1,39 +1,41 @@
 #!/usr/bin/python3
-import yaml
-import re
 import os
+import re
+import yaml
 current_dir = os.path.dirname(__file__)
 
 no_param_instructions = {}
 param_instructions = {}
 
-with open(current_dir + r'/../code_gen/opcodes.yaml') as file:
+with open(current_dir + r'/../code_gen/opcodes.yaml', encoding='utf-8') as file:
     opcodes = yaml.full_load(file)
 
 for opcode in opcodes:
     if opcode['name'] == '---':
         continue
     if opcode['data'] == 0:
-        no_param_instructions[opcode['opcode']] = [opcode['code'], 0]
+        no_param_instructions[opcode['opcode']] = opcode['code']
     else:
-        param_instructions[opcode['regex']] = [opcode['code'], opcode['data']]
+        param_instructions[opcode['regex']] = opcode
+
 
 def asm(line: str) -> list:
     cmd = line.strip().replace("  ", " ").upper()
 
     if cmd in no_param_instructions:
-        return [no_param_instructions[cmd][0]]
+        return [no_param_instructions[cmd]]
 
-    for regex in param_instructions:
+    for regex, instruction in param_instructions.items():
         match = re.match(regex, cmd)
         if match:
-            date_len = param_instructions[regex][1]
+            data_len = instruction['data']
             param = int(match.group(1))
-            if(date_len == 1):
-                return [param_instructions[regex][0], param & 0xFF]
+            if data_len == 1:
+                return [instruction['code'], param & 0xFF]
             else:
-                return [param_instructions[regex][0], param & 0xFF, (param & 0xFF00) >> 8]
+                return [instruction['code'], param & 0xFF, (param & 0xFF00) >> 8]
     return []
+
 
 if __name__ == '__main__':
     print(asm("mov b,a"))

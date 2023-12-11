@@ -2,11 +2,12 @@
 #include "emu-8080.h"
 #include "emu.h"
 #include "emu-screen.h"
-static int port_read(int p){
+static int port_read(int p)
+{
     return 0;
 }
-static void port_write(int p, int v){
-
+static void port_write(int p, int v)
+{
 }
 struct Emulator *emu_new()
 {
@@ -75,12 +76,13 @@ int emu_execute(struct Emulator *emulator, int clocks_ticks)
         emu_handle_events(emulator);
     }
     int ticks = 0;
-    while (ticks < clocks_ticks)
+    while (ticks < clocks_ticks && !emulator->context->halt)
     {
         int cycles = emu_8080_execute(emulator->context);
         emulator->screen_int_count -= cycles;
         ticks += cycles;
-        if (emulator->screen_int_count < 0) {
+        if (emulator->screen_int_count < 0)
+        {
             ticks += emu_8080_rst(emulator->context, emulator->screen_int_half ? 2 : 1);
             emulator->screen_int_half = 0 - (emulator->screen_int_half - 1);
             emulator->screen_int_count += CYCLES_PER_SCREEN_INTERRUPT;
