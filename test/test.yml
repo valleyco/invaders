@@ -291,20 +291,61 @@
       c: 0
       p: 1
       a: 0
-# - name: test sub
-#   code:
-#     - mvi a,1
-#     - mvi b,255
-#     - sub b
-#   expected:
-#     registers:
-#       a: 2
-#     flags:
-#       z: 0
-#       s: 0
-#       c: 0
-#       p: 1
-#       a: 0
+- name: test sub
+  code:
+    - mvi a,1
+    - mvi b,255
+    - sub b
+  expected:
+    registers:
+      a: 2
+    flags:
+      z: 0
+      s: 0
+      c: 1
+      p: 0
+- name: test sui
+  code:
+    - mvi a,1
+    - sui 255
+  expected:
+    registers:
+      a: 2
+    flags:
+      z: 0
+      s: 0
+      c: 1
+      p: 0
+- name: test sui
+  state:
+    flags:
+      c: 0
+  code:
+    - mvi a,1
+    - sui 255
+  expected:
+    registers:
+      a: 2
+    flags:
+      z: 0
+      s: 0
+      c: 1
+      p: 0
+- name: test sbi
+  state:
+    flags:
+      c: 1
+  code:
+    - mvi a,1
+    - sbi 255
+  expected:
+    registers:
+      a: 1
+    flags:
+      z: 0
+      s: 0
+      c: 1
+      p: 0
 - name: test inr
   code:
     - mvi a, 1

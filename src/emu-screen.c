@@ -43,8 +43,8 @@ size_t load_invaders(unsigned char *buffer)
         printf("could not open invaders.bmp\n");
         exit(1);
     }
-    fseek(f, 62, SEEK_SET);
- //   size_t count = fread(buffer, 1, 7168, f);
+    fseek(f, 0x3E, SEEK_SET);
+    size_t count = fread(buffer, 1, 7168, f);
     fclose(f);
     return 7168;
 }

@@ -174,11 +174,20 @@ static inline int inst_8080_aci(struct Context *context, int op)
     return cycles;
 }
 
+static inline void inst_8080_sub_common(struct Context *context, reg8_t val, int c)
+{
+    int result = context->reg[REG_A] - val - c;
+    //    printf("-------> result:%i %i %i\n",context->reg[REG_A],result, val);
+    context->flag[A_FLAG] = ((context->reg[REG_A] & 0x0f) + ((val + c) & 0x0f)) > 0xf;
+    context->reg[REG_A] = result & 0xff;
+    update_flags(context, result, 1);
+}
+
 static inline int inst_8080_sub(struct Context *context, int op)
 {
     const int cycles = 4;
     const int val = get_reg_val(context, op & 7);
-    inst_8080_add_common(context, (-val) & 0xff, 0);
+    inst_8080_sub_common(context, val, 0);
     return cycles;
 }
 
@@ -186,23 +195,23 @@ static inline int inst_8080_sui(struct Context *context, int op)
 {
     const int cycles = 7;
     const int val = fetch_pc_byte(context);
-    inst_8080_add_common(context, (-val) & 0xff, 0);
+    inst_8080_sub_common(context, val, 0);
     return cycles;
 }
 
 static inline int inst_8080_sbb(struct Context *context, int op)
 {
     const int cycles = 4;
-    const int val = get_reg_val(context, op & 7) + context->flag[C_FLAG];
-    inst_8080_add_common(context, (-val) & 0xff, 0);
+    const int val = get_reg_val(context, op & 7);
+    inst_8080_sub_common(context, val, context->flag[C_FLAG]);
     return cycles;
 }
 
 static inline int inst_8080_sbi(struct Context *context, int op)
 {
     const int cycles = 7;
-    const int val = fetch_pc_byte(context) + context->flag[C_FLAG];
-    inst_8080_add_common(context, (-val) & 0xff, 0);
+    const int val = fetch_pc_byte(context);
+    inst_8080_sub_common(context, val, context->flag[C_FLAG]);
     return cycles;
 }
 

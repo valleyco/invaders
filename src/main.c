@@ -13,9 +13,8 @@
 // called when window is closed
 
 static GdkPixbuf *pixbuf;
-static GtkImage *screenimage;
+static GtkImage *screenImage;
 static gint64 emu_cycle_last_run;
-static unsigned char image_buffer[8192];
 static char app_dir[PATH_MAX];
 
 /*
@@ -32,9 +31,6 @@ static void on_window_main_destroy(GtkWidget *window, GApplication *app)
 static gboolean emulation_update(gpointer user_data)
 {
     struct Emulator *em = (struct Emulator *)user_data;
-    //update_pixbuffer(em, pixbuf);
-    //gtk_image_set_from_pixbuf(screenimage, pixbuf);
-    //return TRUE;
     gint64 now = g_get_monotonic_time();
     gint64 diff = (now - emu_cycle_last_run) / 1000; // find how much time we need to cover in miliseconds
     int cycles = (CPU_8080_HZ * diff) / 1000;
@@ -45,7 +41,7 @@ static gboolean emulation_update(gpointer user_data)
     emu_cycle_last_run = now;
     // update the screen
     update_pixbuffer(em, pixbuf);
-    //gtk_image_set_from_pixbuf(screenimage, pixbuf);
+    gtk_image_set_from_pixbuf(screenImage, pixbuf);
 
     printf("time elapsed %li, %i           \r", diff, cycles);
     return TRUE;
@@ -58,8 +54,7 @@ static void on_app_activate(GtkApplication *app, GtkBuilder *builder)
 
     GtkWidget *window = GTK_WIDGET(gtk_builder_get_object(builder, "gtk_main_window"));
     gtk_application_add_window(app, (GtkWindow *)(window));
-    screenimage = GTK_IMAGE(gtk_builder_get_object(builder, "ID_SCREEN_IMAGE"));
-    // g_signal_connect(window, "destroy", G_CALLBACK(on_window_main_destroy), app);
+    screenImage = GTK_IMAGE(gtk_builder_get_object(builder, "ID_SCREEN_IMAGE"));
     gtk_widget_show_all(GTK_WIDGET(window));
 }
 
@@ -74,8 +69,6 @@ int main(int argc, char *argv[])
     g_signal_connect(app, "activate", G_CALLBACK(on_app_activate), builder);
 
     pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, 256, 224);
-    load_invaders(image_buffer);
-    //do_update_buffer(image_buffer, pixbuf);
 
     // start the application, terminate by closing the window
     // GtkApplication* is upcast to GApplication* with G_APPLICATION() macro

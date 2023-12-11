@@ -13,15 +13,19 @@ struct Emulator *emu_new()
 {
     struct Emulator *emulator = (struct Emulator *)malloc(sizeof(struct Emulator));
     emulator->context = (struct Context *)malloc(sizeof(struct Context));
-    emulator->clock_ticks = 0;
+    
     emulator->context->memory = emulator->memory;
     emulator->context->port_read = port_read;
     emulator->context->port_write = port_write;
     emulator->context->PC = 0;
-    emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
+    emulator->context->halt = 0;
+
+    emulator->clock_ticks = 0;
     emulator->shift_register = 0;
     emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
     emulator->screen_int_half = 0;
+    emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
+
     load_invaders(emulator->memory + SCREEN_BUFFER_LOCATION);
     load_rom(emulator, "../rom/invaders.rom");
     return emulator;
@@ -76,15 +80,19 @@ int emu_execute(struct Emulator *emulator, int clocks_ticks)
         emu_handle_events(emulator);
     }
     int ticks = 0;
-    while (ticks < clocks_ticks && !emulator->context->halt)
+    while (ticks < clocks_ticks )
     {
         int cycles = emu_8080_execute(emulator->context);
+        if(emulator->context->PC > 16000){
+            printf("ERROR after %i ticks\n",ticks);
+            exit(1);
+        }
         emulator->screen_int_count -= cycles;
         ticks += cycles;
         if (emulator->screen_int_count < 0)
         {
             ticks += emu_8080_rst(emulator->context, emulator->screen_int_half ? 2 : 1);
-            emulator->screen_int_half = 0 - (emulator->screen_int_half - 1);
+            emulator->screen_int_half = 1 - emulator->screen_int_half;
             emulator->screen_int_count += CYCLES_PER_SCREEN_INTERRUPT;
         }
     }
