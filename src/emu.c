@@ -29,7 +29,6 @@ struct Emulator *emu_new()
     emulator->port[1] = 0b00001000;
     emulator->port[2] = 0b00001011;
 
-    // load_invaders(emulator->memory + SCREEN_BUFFER_LOCATION);
     load_rom(emulator, "../rom/invaders.rom");
     return emulator;
 }

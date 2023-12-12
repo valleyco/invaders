@@ -6,7 +6,7 @@
 static void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf)
 {
     const int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);
-    const int pixbuf_rowstride_diff = gdk_pixbuf_get_rowstride(pixbuf) - (SCREEN_WIDTH * pixbuf_n_channels);
+    const int pixbuf_rowstride_diff = gdk_pixbuf_get_rowstride(pixbuf) - (SCREEN_HEIGHT * pixbuf_n_channels);
     const unsigned char *p_image = buffer;
     guchar *pixbuf_pixels = gdk_pixbuf_get_pixels(pixbuf);
     // printf("pixbuf_rowstride_diff %d\n",pixbuf_rowstride_diff);
@@ -80,7 +80,7 @@ size_t load_invaders(unsigned char *buffer)
         exit(1);
     }
     fseek(f, 62, SEEK_SET);
-    //   size_t count = fread(buffer, 1, 7168, f);
+    size_t count = fread(buffer, 1, 7168, f);
     fclose(f);
     return 7168;
 }

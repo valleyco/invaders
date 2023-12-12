@@ -71,7 +71,7 @@ static inline int inst_8080_lhld(struct Context *context, int op)
 {
     const int cycles = 16;
     int addr = fetch_pc_word(context);
-    addr = context->memory[addr] + (context->memory[addr + 1] << 8);
+    // addr = context->memory[addr] + (context->memory[addr + 1] << 8);
     context->reg[REG_L] = context->memory[addr];
     context->reg[REG_H] = context->memory[addr + 1];
     return cycles;
@@ -81,7 +81,7 @@ static inline int inst_8080_shld(struct Context *context, int op)
 {
     const int cycles = 16;
     int addr = fetch_pc_word(context);
-    addr = context->memory[addr] + (context->memory[addr + 1] << 8);
+    // addr = context->memory[addr] + (context->memory[addr + 1] << 8);
     context->memory[addr] = context->reg[REG_L];
     context->memory[addr + 1] = context->reg[REG_H];
     return cycles;

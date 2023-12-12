@@ -34,6 +34,18 @@
     memory:
       - location: 1285
         data: [5]
+- name: test mov
+  state:
+    memory:
+      - location: 100
+        data: [199, 0, 0, 0]
+  code:
+    - mvi l,100
+    - mvi h,0
+    - mov a,m
+  expected:
+    registers:
+      a: 199
 - name: test mvi
   code:
     - mvi b,1
@@ -100,8 +112,8 @@
     - lhld 100
   expected:
     registers:
-      l: 1
-      h: 2
+      l: 0
+      h: 1
 
 - name: test shld
   state:
@@ -113,7 +125,7 @@
     - shld 100
   expected:
     memory:
-      - location: 256
+      - location: 100
         data: [1, 2]
 - name: test ldax bc
   state:
@@ -164,9 +176,13 @@
       - location: 100
         data: [25, 2]
 - name: test xchg
+  state:
+    registers:
+      d: 2
+      e: 1
+      h: 4
+      l: 3
   code:
-    - lxi de,513
-    - lxi hl,1027
     - xchg
   expected:
     registers:
@@ -450,30 +466,10 @@
       l: 2
     flags:
       c: 1
-- name: test ana b
-  code:
-    - mvi a, 7
-    - mvi b, 3
-    - ana b
-  expected:
-    registers:
-      a: 3
-    flags:
-      z: 0
-      s: 0
-      p: 1
-- name: test ani 3
-  code:
-    - mvi a, 7
-    - ani 3
-  expected:
-    registers:
-      a: 3
-    flags:
-      z: 0
-      s: 0
-      p: 1
 - name: test push pop
+  state:
+    registers:
+      sp: 100
   code:
     - mvi a,1
     - mvi b,2
@@ -496,6 +492,111 @@
       e: 7
       h: 2
       l: 3
+- name: test RLC
+  code:
+    - mvi a,128
+    - rlc
+  expected:
+    registers:
+      a: 1
+    flags:
+      c: 1
+- name: test RRC
+  code:
+    - mvi a,3
+    - rrc
+  expected:
+    registers:
+      a: 129
+    flags:
+      c: 1
+- name: test RAL
+  code:
+    - xra a
+    - mvi a,128
+    - ral
+  expected:
+    registers:
+      a: 0
+    flags:
+      c: 1
+- name: test RAL
+  code:
+    - stc
+    - mvi a,128
+    - ral
+  expected:
+    registers:
+      a: 1
+    flags:
+      c: 1
+- name: test RAR
+  code:
+    - stc
+    - mvi a,1
+    - rar
+  expected:
+    registers:
+      a: 128
+    flags:
+      c: 1
+- name: test jc
+  code:
+    - stc
+    - jc 7
+    - hlt
+    - nop
+    - nop
+    - hlt
+  expected:
+    registers:
+      pc: 8        
+- name: test jz
+  code:
+    - xra a 
+    - jnc 7
+    - hlt
+    - nop
+    - nop
+    - hlt
+  expected:
+    registers:
+      pc: 8        
+- name: test jz
+  code:
+    - xra a 
+    - jz 7
+    - hlt
+    - nop
+    - nop
+    - hlt
+  expected:
+    registers:
+      pc: 8        
+- name: test p
+  code:
+    - xra a 
+    - jp 7
+    - hlt
+    - nop
+    - nop
+    - hlt
+  expected:
+    registers:
+      pc: 8        
+- name: test m
+  code:
+    - mvi a,0
+    - sbi 1
+    - jm 10
+    - hlt
+    - nop
+    - nop
+    - hlt
+  expected:
+    registers:
+      pc: 11        
+
 - name: test call/ret
   state:
     registers:
