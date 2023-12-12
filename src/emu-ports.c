@@ -1,5 +1,4 @@
 #include "emu-ports.h"
-
 int port_read(struct Emulator *emu, int p)
 {
     switch (p)
@@ -16,7 +15,6 @@ void port_write(struct Emulator *emu, int p, int v)
     {
     case 2:
         emu->shift_amount = v & 7;
-       // emu->port[3] = emu->shift_register >> (8 - v);
         break;
     case 3: // sound - not implemented
         break;

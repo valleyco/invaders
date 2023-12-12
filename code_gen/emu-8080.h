@@ -53,10 +53,11 @@ struct Context
     int halt;
     int interrupt;
     unsigned char* memory;
-    int (*port_read)(int p);
-    void (*port_write)(int p, int v);
+    int (*port_read)(void*g, int p);
+    void (*port_write)(void*g, int p, int v);
     int address_mask;
     reg8_t M;
+    void *gData;
 };
 
 void emu_8080_context_init(struct Context *context, const int mem_size);

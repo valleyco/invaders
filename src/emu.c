@@ -2,18 +2,14 @@
 #include "emu-8080.h"
 #include "emu.h"
 #include "emu-screen.h"
-static int port_read(int p)
-{
-    return 0;
-}
-static void port_write(int p, int v)
-{
-}
+#include "emu-ports.h"
+
 struct Emulator *emu_new()
 {
     struct Emulator *emulator = (struct Emulator *)malloc(sizeof(struct Emulator));
     emulator->context = (struct Context *)malloc(sizeof(struct Context));
 
+    emulator->context->gData = (void *)emulator;
     emulator->context->memory = emulator->memory;
     emulator->context->port_read = port_read;
     emulator->context->port_write = port_write;
@@ -26,9 +22,9 @@ struct Emulator *emu_new()
     emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
     emulator->screen_int_half = 0;
     emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
-    emulator->port[0] = 0b00001111;
-    emulator->port[1] = 0b00001000;
-    emulator->port[2] = 0b00001011;
+    // emulator->port[0] = 0b00001111;
+    // emulator->port[1] = 0b00001001;
+    // emulator->port[2] = 0b00001011;
 
     load_rom(emulator, "../rom/");
     return emulator;
@@ -93,9 +89,9 @@ int emu_execute(struct Emulator *emulator, int clocks_ticks)
         }
         emulator->screen_int_count -= cycles;
         ticks += cycles;
-        if (emulator->screen_int_count < 0)
+        if (emulator->screen_int_count < 0 && emulator->context->interrupt)
         {
-            ticks += emu_8080_rst(emulator->context, emulator->screen_int_half ? 2 : 1);
+            ticks += emu_8080_rst(emulator->context, emulator->screen_int_half ? 1 : 2);
             emulator->screen_int_half = 1 - emulator->screen_int_half;
             emulator->screen_int_count += CYCLES_PER_SCREEN_INTERRUPT;
         }

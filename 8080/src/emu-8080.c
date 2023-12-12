@@ -621,14 +621,14 @@ static inline int inst_8080_in(struct Context *context, int op)
 {
     const int cycles = 10;
     const int port = fetch_pc_byte(context);
-    context->reg[REG_A] = context->port_read(port);
+    context->reg[REG_A] = context->port_read(context->gData, port);
     return cycles;
 }
 
 static inline int inst_8080_out(struct Context *context, int op)
 {
     const int cycles = 10;
-    context->port_write(fetch_pc_byte(context), context->reg[REG_A]);
+    context->port_write(context->gData,fetch_pc_byte(context), context->reg[REG_A]);
     return cycles;
 }
 
