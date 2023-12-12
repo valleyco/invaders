@@ -178,18 +178,18 @@
 - name: test xchg
   state:
     registers:
-      d: 2
-      e: 1
-      h: 4
-      l: 3
+      d: 1
+      e: 2
+      h: 3
+      l: 4
   code:
     - xchg
   expected:
     registers:
-      d: 4
-      e: 3
-      h: 2
-      l: 1
+      d: 3
+      e: 4
+      h: 1
+      l: 2
 - name: test add minus
   code:
     - mvi a,5
@@ -550,10 +550,10 @@
     - hlt
   expected:
     registers:
-      pc: 8        
+      pc: 8
 - name: test jz
   code:
-    - xra a 
+    - xra a
     - jnc 7
     - hlt
     - nop
@@ -561,10 +561,10 @@
     - hlt
   expected:
     registers:
-      pc: 8        
+      pc: 8
 - name: test jz
   code:
-    - xra a 
+    - xra a
     - jz 7
     - hlt
     - nop
@@ -572,10 +572,21 @@
     - hlt
   expected:
     registers:
-      pc: 8        
+      pc: 8
+- name: test jnz (con not met)
+  code:
+    - xra a
+    - jnz 7
+    - hlt
+    - nop
+    - nop
+    - hlt
+  expected:
+    registers:
+      pc: 5
 - name: test p
   code:
-    - xra a 
+    - xra a
     - jp 7
     - hlt
     - nop
@@ -583,7 +594,7 @@
     - hlt
   expected:
     registers:
-      pc: 8        
+      pc: 8
 - name: test m
   code:
     - mvi a,0
@@ -595,8 +606,36 @@
     - hlt
   expected:
     registers:
-      pc: 11        
-
+      pc: 11
+- name: test CMP
+  code:
+    - mvi a,1
+    - mvi b,2
+    - cmp b
+  expected:
+    flags:
+      c: 1
+      p: 1
+      z: 0
+      s: 1
+- name: test CMP
+  code:
+    - mvi a,2
+    - mvi b,1
+    - cmp b
+  expected:
+    flags:
+      c: 0
+      p: 0
+      z: 0
+      s: 0
+- name: test CMA
+  code:
+    - mvi a,254
+    - cma
+  expected:
+    registers:
+      a: 1
 - name: test call/ret
   state:
     registers:
@@ -613,3 +652,110 @@
     memory:
       - location: 62
         data: [3, 0]
+- name: push/pop psw
+  state:
+    registers:
+      a: 4
+      sp: 100
+    flags:
+      c: 1
+      z: 0
+      s: 0
+      p: 0
+  code:
+    - push psw
+    - xra a
+    - pop psw
+  expected:
+    registers:
+      a: 4
+    flags:
+      c: 1
+      z: 0
+      s: 0
+      p: 0
+
+- name: test rst 1
+  state:
+    memory:
+      - location: 0
+        data: [118, 118, 118, 118, 118, 118, 118, 118, 118, 118]
+    registers:
+      sp: 100
+  code:
+    - rst 1
+  expected:
+    registers:
+      pc: 9
+- name: test rst 0
+  state:
+    memory:
+      - location: 0
+        data:
+          [
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+            118,
+          ]
+    registers:
+      sp: 100
+  code:
+    - nop
+    - mvi a,118 # set address 0 to halt instead of nop
+    - sta 0
+    - rst 0
+  expected:
+    registers:
+      pc: 1
+- name:
+  state:
+    registers:
+      a: 1
+      h: 200
+      l: 100
+      sp: 100
+  code:
+    - LXI DE,7680
+    - PUSH HL
+    - MVI H,0
+    - MOV L,A
+    - DAD HL
+    - DAD HL
+    - DAD HL
+    - DAD DE
+    - XCHG
+    - POP HL
+    - MVI B,8
+    - HLT
+  expected:
+    registers:
+      d: 30
+      e: 8
+      h: 200
+      l: 100
+- name: test DAD HL
+  state:
+    registers:
+      h: 0
+      l: 1
+  code:
+    - dad hl
+  expected:
+    registers:
+      l: 2      

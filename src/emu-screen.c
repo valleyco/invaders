@@ -6,14 +6,14 @@
 static void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf)
 {
     const int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);
-    const int pixbuf_rowstride_diff = gdk_pixbuf_get_rowstride(pixbuf) - (SCREEN_HEIGHT * pixbuf_n_channels);
+    const int pixbuf_rowstride_diff = gdk_pixbuf_get_rowstride(pixbuf) - (SCREEN_WIDTH * pixbuf_n_channels);
     const unsigned char *p_image = buffer;
     guchar *pixbuf_pixels = gdk_pixbuf_get_pixels(pixbuf);
     // printf("pixbuf_rowstride_diff %d\n",pixbuf_rowstride_diff);
     // exit(1);
-    for (int r = 0; r < SCREEN_WIDTH; r++)
+    for (int r = 0; r < SCREEN_HEIGHT; r++)
     {
-        for (int c = 0; c < (SCREEN_HEIGHT / 8); c++)
+        for (int c = 0; c < (SCREEN_WIDTH / 8); c++)
         {
             for (int b = 0x80; b; b >>= 1)
             //            for (int b = 1; b < 0x100; b <<= 1)
@@ -38,11 +38,11 @@ static void do_update_buffer_flip(const unsigned char *buffer, const GdkPixbuf *
     const guchar *pixbuf_pixels = gdk_pixbuf_get_pixels(pixbuf);
     const int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);
     const int pixbuf_rowstride = gdk_pixbuf_get_rowstride(pixbuf);
-    guchar *target = pixbuf_pixels + pixbuf_rowstride * (SCREEN_HEIGHT - 1);
+    guchar *target = pixbuf_pixels + pixbuf_rowstride * (SCREEN_WIDTH - 1);
     // FILE *file = fopen("debug.log","w");
-    for (int r = 0; r < SCREEN_WIDTH; r++)
+    for (int r = 0; r < SCREEN_HEIGHT; r++)
     {
-        for (int c = 0; c < (SCREEN_HEIGHT / 8); c++)
+        for (int c = 0; c < (SCREEN_WIDTH / 8); c++)
         {
             for (int b = 1; b < 0x100; b <<= 1)
             //for (int b = 0x80; b; b >>= 1)
@@ -58,7 +58,7 @@ static void do_update_buffer_flip(const unsigned char *buffer, const GdkPixbuf *
             }
             p_image++;
         }
-        target += pixbuf_rowstride * SCREEN_HEIGHT + pixbuf_n_channels;
+        target += pixbuf_rowstride * SCREEN_WIDTH + pixbuf_n_channels;
     }
     // GError** error;
     // gdk_pixbuf_save(pixbuf,"image.jpeg","jpeg", &error, "quality", "100", NULL);
@@ -68,6 +68,8 @@ static void do_update_buffer_flip(const unsigned char *buffer, const GdkPixbuf *
 
 void update_pixbuffer(struct Emulator *emu, GdkPixbuf *pixbuf)
 {
+    // FILE *f = fopen("image.raw", "r");
+    // fread(emu->memory + SCREEN_BUFFER_LOCATION, 224 * 32, 1, f);
     do_update_buffer_flip(emu->memory + SCREEN_BUFFER_LOCATION, pixbuf);
 }
 

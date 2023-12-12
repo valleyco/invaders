@@ -6,10 +6,10 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <gtk/gtktypes.h>
+#include <limits.h>
 #include "emu.h"
 #include "emu-screen.h"
 #include "utils.h"
-
 // called when window is closed
 
 static GdkPixbuf *pixbuf;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
     g_signal_connect(app, "activate", G_CALLBACK(on_app_activate), builder);
 
-    pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_WIDTH, SCREEN_HEIGHT);
+    pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_WIDTH, SCREEN_WIDTH);
     //pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_HEIGHT, SCREEN_WIDTH);
 
     // start the application, terminate by closing the window

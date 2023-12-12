@@ -13,7 +13,7 @@ struct Emulator *emu_new()
 {
     struct Emulator *emulator = (struct Emulator *)malloc(sizeof(struct Emulator));
     emulator->context = (struct Context *)malloc(sizeof(struct Context));
-    
+
     emulator->context->memory = emulator->memory;
     emulator->context->port_read = port_read;
     emulator->context->port_write = port_write;
@@ -30,7 +30,7 @@ struct Emulator *emu_new()
     emulator->port[1] = 0b00001000;
     emulator->port[2] = 0b00001011;
 
-    load_rom(emulator, "../rom/invaders.rom");
+    load_rom(emulator, "../rom/");
     return emulator;
 }
 
@@ -83,11 +83,12 @@ int emu_execute(struct Emulator *emulator, int clocks_ticks)
         emu_handle_events(emulator);
     }
     int ticks = 0;
-    while (ticks < clocks_ticks )
+    while (ticks < clocks_ticks)
     {
         int cycles = emu_8080_execute(emulator->context);
-        if(emulator->context->PC > 16000){
-            printf("ERROR after %i ticks\n",ticks);
+        if (emulator->context->PC > 16000)
+        {
+            printf("ERROR after %i ticks\n", ticks);
             exit(1);
         }
         emulator->screen_int_count -= cycles;
@@ -103,11 +104,18 @@ int emu_execute(struct Emulator *emulator, int clocks_ticks)
     return ticks;
 }
 
-size_t load_rom(struct Emulator *emulator, const char *filename)
+size_t load_rom(struct Emulator *emulator, const char *romDir)
 {
-    FILE *f = fopen(filename, "r");
-    size_t count = fread(emulator->memory, 1, 8192, f);
-    printf("rom loaded rom size=%li\n", count);
-    fclose(f);
-    return count;
+    char *ext[] = {"h", "g", "f", "e", 0};
+    char filename[255];
+    for (int i = 0; ext[i]; i++)
+    {
+        sprintf(filename, "%s/invaders.%s", romDir, ext[i]);
+        // printf("%s\n",filename);exit(1);
+        FILE *f = fopen(filename, "r");
+        size_t count = fread(emulator->memory + (i * 2048), 1, 2048, f);
+        printf("rom loaded rom size=%li\n", count);
+        fclose(f);
+    }
+    return 0;
 }

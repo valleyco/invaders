@@ -299,17 +299,17 @@ static inline int inst_8080_dcx(struct Context *context, int op)
 static inline int inst_8080_dad(struct Context *context, int op)
 {
     const int cycles = 10;
-    int val = context->reg[REG_L] + (context->reg[REG_H] << 8);
+    int val = context->reg[REG_L] | (context->reg[REG_H] << 8);
     switch (op & 0x30)
     {
     case RP_BC:
-        val += context->reg[REG_C] + (context->reg[REG_B] << 8);
+        val += context->reg[REG_C] | (context->reg[REG_B] << 8);
         break;
     case RP_DE:
-        val += context->reg[REG_E] + (context->reg[REG_D] << 8);
+        val += context->reg[REG_E] | (context->reg[REG_D] << 8);
         break;
     case RP_HL:
-        val = context->reg[REG_L] + (context->reg[REG_H] << 8);
+        val += context->reg[REG_L] | (context->reg[REG_H] << 8);
         break;
     case RP_SP:
         val += context->SP;
@@ -570,8 +570,7 @@ static inline int inst_8080_push(struct Context *context, int op)
     if (op == 0b11110101)
     {
         context->memory[--context->SP] = context->reg[REG_A];
-        pack_flags(context);
-        context->memory[--context->SP] = context->reg[REG_FLAG];
+        context->memory[--context->SP] = pack_flags(context);
     }
     else
     {
@@ -586,9 +585,9 @@ static inline int inst_8080_pop(struct Context *context, int op)
     const int cycles = 10;
     if (op == 0b11110001)
     {
-        context->reg[REG_FLAG] = context->memory[context->SP++];
+        int flags = context->memory[context->SP++];
         context->reg[REG_A] = context->memory[context->SP++];
-        unpack_flags(context);
+        unpack_flags(context, flags);
     }
     else
     {
@@ -726,6 +725,7 @@ int emu_8080_execute(struct Context *context)
 
     case 0x10:
         return inst_8080_illegal(context, 0x10);
+   
     case 0x11:
         return inst_8080_lxi(context, 0x11);
 
