@@ -22,9 +22,9 @@ struct Emulator *emu_new()
     emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
     emulator->screen_int_half = 0;
     emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
-    // emulator->port[0] = 0b00001111;
-    // emulator->port[1] = 0b00001001;
-    // emulator->port[2] = 0b00001011;
+    emulator->port[0] = 0b00001111;
+    emulator->port[1] = 0b00001001;
+    emulator->port[2] = 0b00001011;
 
     load_rom(emulator, "../rom/");
     return emulator;
