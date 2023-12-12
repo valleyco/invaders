@@ -35,6 +35,7 @@ struct Emulator
     char port[8];
     struct EventQueue event_queue;
     int shift_register;
+    int shift_amount;
     int screen_int_count;
     int screen_int_half;
 };

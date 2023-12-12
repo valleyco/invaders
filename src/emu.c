@@ -22,6 +22,7 @@ struct Emulator *emu_new()
 
     emulator->clock_ticks = 0;
     emulator->shift_register = 0;
+    emulator->shift_amount = 0;
     emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
     emulator->screen_int_half = 0;
     emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
