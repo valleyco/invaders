@@ -10,7 +10,7 @@ env = Environment(
 
 with open(f'{current_dir}/instructions.yaml', encoding='utf-8') as file:
     instructions = yaml.full_load(file)
-with open('{current_dir}/opcodes.yaml', encoding='utf-8') as file:
+with open(f'{current_dir}/opcodes.yaml', encoding='utf-8') as file:
     opcodes = yaml.full_load(file)
 
 template = env.get_template(current_dir + '/template-emu-8080.c')

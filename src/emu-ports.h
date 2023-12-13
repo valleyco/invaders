@@ -21,6 +21,13 @@
 #define PORT_2_READ_P2_LEFT 32
 #define PORT_2_READ_P2_RIGHT 64
 #define PORT_2_READ_COIN_INFO 128
+struct PortDevice
+{
+  int portCount;
+  int portOffset;
+  int (**read)(void *g, int p);
+  void (**write)(void *g, int p, int v);
+};
 
 int port_read(struct Emulator *emu, int p);
 void port_write(struct Emulator *emu, int p, int v);

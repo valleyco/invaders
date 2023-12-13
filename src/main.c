@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "emu-screen.h"
 #include "utils.h"
-#include "keyboard.h"
+#include "emu-keyboard.h"
 #include "emu-ports.h"
 
 static GdkPixbuf *pixbuf;
@@ -30,68 +30,7 @@ static void on_window_main_destroy(GtkWidget *window, GApplication *app)
 gboolean emu_key_function(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
     struct Emulator *emu = (struct Emulator *)data;
-    int button = get_key_action(event->keyval);
-    int p, b;
-    switch (button)
-    {
-    case KEY_SHOT:
-        p = 0;
-        b = PORT_0_READ_FIRE;
-        break;
-    case KEY_LEFT:
-        p = 0;
-        b = PORT_0_READ_LEFT;
-        break;
-    case KEY_RIGHT:
-        p = 0;
-        b = PORT_0_READ_RIGHT;
-        break;
-    case KEY_P1_START:
-        p = 1;
-        b = PORT_1_READ_P1_START;
-        break;
-    case KEY_P2_START:
-        p = 1;
-        b = PORT_1_READ_P2_START;
-        break;
-    case KEY_P1_SHOT:
-        p = 1;
-        b = PORT_1_READ_P1_SHOOT;
-        break;
-    case KEY_P1_LEFT:
-        p = 1;
-        b = PORT_1_READ_P1_LEFT;
-        break;
-    case KEY_P1_RIGHT:
-        p = 1;
-        b = PORT_1_READ_P1_RIGHT;
-        break;
-    case KEY_P2_SHOT:
-        p = 2;
-        b = PORT_2_READ_P2_SHOOT;
-        break;
-    case KEY_P2_LEFT:
-        p = 2;
-        b = PORT_2_READ_P2_LEFT;
-        break;
-    case KEY_P2_RIGHT:
-        p = 2;
-        b = PORT_2_READ_P2_RIGHT;
-        break;
-
-    default:
-        return FALSE;
-    }
-    if (event->type == GDK_KEY_PRESS)
-    {
-    printf("%d %d\n",p,b);
-        emu->port[p] |= b;
-    }
-    else
-    {
-        emu->port[p] &= ~b;
-    }
-    return TRUE;
+    return emu_handle_keyboard(emu,event->keyval,event->type == GDK_KEY_PRESS);
 }
 
 /*

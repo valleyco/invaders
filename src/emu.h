@@ -1,5 +1,6 @@
 #pragma once
 #include <stdlib.h>
+#include <stddef.h>
 #include "emu-8080.h"
 
 // 100 ms
@@ -33,11 +34,13 @@ struct Emulator
     int clock_ticks;
     unsigned char memory[16768];
     char port[8];
+    struct PortDevice* dev_read[256];
+    struct PortDevice* dev_write[256];
     struct EventQueue event_queue;
-    int shift_register;
-    int shift_amount;
     int screen_int_count;
     int screen_int_half;
+    struct KeyboardDevice *kbDevice;
+    struct ShifterDevice *shiftDevice;
 };
 
 struct Emulator *emu_new();
@@ -47,3 +50,5 @@ void emu_free(struct Emulator *emulator);
 void emu_event_add(struct Emulator *emulator, struct Event event);
 int emu_execute(struct Emulator *emulator, int clocks_ticks);
 size_t load_rom(struct Emulator *emulator, const char* filename);
+int emu_handle_keyboard(struct Emulator *emulator, int keyVal, int isPressed);
+void emu_register_device(struct Emulator *emulator, struct PortDevice *device, int startPort);

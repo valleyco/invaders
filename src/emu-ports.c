@@ -1,30 +1,21 @@
 #include "emu-ports.h"
+
 int port_read(struct Emulator *emu, int p)
 {
-    switch (p)
+    struct PortDevice *dev;
+    if ((dev = emu->dev_read[p]))
     {
-    case 3:
-        return emu->shift_register >> (8 - emu->shift_amount);
+        const int v_port = p - dev->portOffset;
+        return dev->read[v_port] ? dev->read[v_port](dev, v_port) : 0;
     }
-    return emu->port[p & 7];
+    return 0;
 }
 
 void port_write(struct Emulator *emu, int p, int v)
 {
-    switch (p)
+    struct PortDevice *dev;
+    if ((dev = emu->dev_write[p]))
     {
-    case 2:
-        emu->shift_amount = v & 7;
-        break;
-    case 3: // sound - not implemented
-        break;
-    case 4:
-        emu->shift_register = (v << 8) | (emu->shift_register >>= 8);
-        break;
-    case 5: // sound - not implemented
-        break;
-    default:
-        emu->port[p & 7] = v;
-        break;
+        dev->write[p - dev->portOffset](dev, p - dev->portOffset, v);
     }
 }

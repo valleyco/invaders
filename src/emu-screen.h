@@ -8,4 +8,3 @@
 
 //void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf);
 void update_pixbuffer(struct Emulator *emu, GdkPixbuf *pixbuf);
-size_t load_invaders(unsigned char *buffer);

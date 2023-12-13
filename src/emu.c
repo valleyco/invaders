@@ -1,14 +1,18 @@
 #include <stdlib.h>
+#include <string.h>
 #include "emu-8080.h"
 #include "emu.h"
 #include "emu-screen.h"
 #include "emu-ports.h"
+#include "emu-keyboard.h"
+#include "emu-shifter.h"
 
 struct Emulator *emu_new()
 {
     struct Emulator *emulator = (struct Emulator *)malloc(sizeof(struct Emulator));
     emulator->context = (struct Context *)malloc(sizeof(struct Context));
-
+    memset(emulator->dev_read, 0, 256 * sizeof(emulator->dev_read[0]));
+    memset(emulator->dev_write, 0, 256 * sizeof(emulator->dev_write[0]));
     emulator->context->gData = (void *)emulator;
     emulator->context->memory = emulator->memory;
     emulator->context->port_read = port_read;
@@ -16,18 +20,44 @@ struct Emulator *emu_new()
     emulator->context->PC = 0;
     emulator->context->halt = 0;
 
+    emulator->kbDevice = emu_keyboard_init();
+    emu_register_device(emulator, emulator->kbDevice, 0);
+    emulator->shiftDevice = emu_shifter_init();
+    emu_register_device(emulator, emulator->shiftDevice, 2);
+    
     emulator->clock_ticks = 0;
-    emulator->shift_register = 0;
-    emulator->shift_amount = 0;
     emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
     emulator->screen_int_half = 0;
     emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
-    emulator->port[0] = 0b00001111;
-    emulator->port[1] = 0b00001001;
-    emulator->port[2] = 0b00001011;
 
     load_rom(emulator, "../rom/");
     return emulator;
+}
+
+void emu_register_device(struct Emulator *emulator, struct PortDevice *device, int startPort)
+{
+    device->portOffset = startPort;
+    for (int n = 0; n < device->portCount; n++)
+    {
+        if (device->read[n])
+        {
+            if (emulator->dev_read[startPort + n])
+            {
+                printf("device read collision on port %d\n", startPort + n);
+                exit(1);
+            }
+            emulator->dev_read[startPort + n] = device;
+        }
+        if (device->write[n])
+        {
+            if (emulator->dev_write[startPort + n])
+            {
+                printf("device write collision on port %d\n", startPort + n);
+                exit(1);
+            }
+            emulator->dev_write[startPort + n] = device;
+        }
+    }
 }
 
 void emu_set_mem(struct Emulator *emulator, int pos, int length, char *data)
@@ -49,6 +79,7 @@ void emu_get_mem(struct Emulator *emulator, int pos, int length, char *buffer)
 void emu_free(struct Emulator *emulator)
 {
     free(emulator->context);
+    emu_keyboard_done(emulator->kbDevice);
     free(emulator);
 }
 
@@ -114,4 +145,9 @@ size_t load_rom(struct Emulator *emulator, const char *romDir)
         fclose(f);
     }
     return 0;
+}
+
+int emu_handle_keyboard(struct Emulator *emulator, int keyVal, int isPressed)
+{
+    return handle_keyboard_event(emulator->kbDevice, keyVal, isPressed);
 }
