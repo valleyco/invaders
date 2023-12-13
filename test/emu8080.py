@@ -1,5 +1,5 @@
 import os
-from ctypes import *
+from ctypes import cdll, c_int, c_char, c_ubyte, c_void_p, CFUNCTYPE, POINTER, pointer, create_string_buffer, Structure
 
 emu8080 = cdll.LoadLibrary(
     os.path.dirname(__file__) +
@@ -42,6 +42,7 @@ flag_map = {
 reg8_t = c_ubyte
 reg16_t = c_int
 
+
 class Emu8080Context(Structure):
     """interface to the C structure"""
     _fields_ = [
@@ -56,7 +57,7 @@ class Emu8080Context(Structure):
         ("port_write", CFUNCTYPE(c_void_p, c_int, c_int)),
         ('address_mask', c_int),
         ('M', reg8_t),
-        ('gData',c_void_p),
+        ('gData', c_void_p),
     ]
 
     def __init__(self):
