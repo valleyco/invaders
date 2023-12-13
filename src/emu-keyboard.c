@@ -24,7 +24,7 @@ static int emu_keyboard_read(struct KeyboardDevice *dev, int v_port)
         result <<= 1;
         result |= dev->key_status[port_bit_map[v_port][i]];
     }
-    if (result && result !=8)
+    if (result && result != 8)
         printf("in %d -> %d\n", v_port, result);
     return result;
 }
@@ -84,7 +84,9 @@ static int get_key_action(int keyVal)
         return KEY_LEFT;
     case GDK_KEY_Right:
         return KEY_RIGHT;
-
+    case GDK_KEY_I:    
+    case GDK_KEY_i:
+        return KEY_CREDIT;    
     default:
         return 0;
     }

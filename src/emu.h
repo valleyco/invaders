@@ -32,7 +32,7 @@ struct Emulator
 {
     struct Context *context;
     int clock_ticks;
-    unsigned char memory[16768];
+    unsigned char memory[65536];
     char port[8];
     struct PortDevice* dev_read[256];
     struct PortDevice* dev_write[256];

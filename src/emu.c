@@ -19,6 +19,7 @@ struct Emulator *emu_new()
     emulator->context->port_write = port_write;
     emulator->context->PC = 0;
     emulator->context->halt = 0;
+    emulator->context->address_mask = 0x3FFF;
 
     emulator->kbDevice = emu_keyboard_init();
     emu_register_device(emulator, emulator->kbDevice, 0);
@@ -113,11 +114,6 @@ int emu_execute(struct Emulator *emulator, int clocks_ticks)
     while (ticks < clocks_ticks)
     {
         int cycles = emu_8080_execute(emulator->context);
-        if (emulator->context->PC > 16000)
-        {
-            printf("ERROR after %i ticks\n", ticks);
-            exit(1);
-        }
         emulator->screen_int_count -= cycles;
         ticks += cycles;
         if (emulator->screen_int_count < 0 && emulator->context->interrupt)
