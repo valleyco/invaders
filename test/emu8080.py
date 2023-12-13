@@ -52,15 +52,17 @@ class Emu8080Context(Structure):
         ("halt", c_int),
         ("interrupt", c_int),
         ("memory", POINTER(c_char * 32768)),
-        ("port_read", CFUNCTYPE(c_int, c_int)),
-        ("port_write", CFUNCTYPE(c_int, c_int, c_int)),
+        ("port_read", CFUNCTYPE(c_void_p, c_int)),
+        ("port_write", CFUNCTYPE(c_void_p, c_int, c_int)),
         ('address_mask', c_int),
         ('M', reg8_t),
+        ('gData',c_void_p),
     ]
 
     def __init__(self):
         super().__init__()
         self.memory = pointer(create_string_buffer(32768))
+        self.address_mask = 0x3FFF
 
     def print(self):
         m_addr = self.registers[REG_L] + (self.registers[REG_H] * 256)
