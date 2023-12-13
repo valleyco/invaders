@@ -56,6 +56,7 @@ struct Context
     int (*port_read)(void*g, int p);
     void (*port_write)(void*g, int p, int v);
     int address_mask;
+    int rom_size;
     reg8_t M;
     void *gData;
 };

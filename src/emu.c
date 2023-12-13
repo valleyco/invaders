@@ -20,6 +20,7 @@ struct Emulator *emu_new()
     emulator->context->PC = 0;
     emulator->context->halt = 0;
     emulator->context->address_mask = 0x3FFF;
+    emulator->context->rom_size = 0x2000;
 
     emulator->kbDevice = emu_keyboard_init();
     emu_register_device(emulator, emulator->kbDevice, 0);
@@ -81,6 +82,7 @@ void emu_free(struct Emulator *emulator)
 {
     free(emulator->context);
     emu_keyboard_done(emulator->kbDevice);
+    emu_shifter_done(emulator->shiftDevice);
     free(emulator);
 }
 

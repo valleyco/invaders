@@ -62,8 +62,6 @@ struct Context
 
 void emu_8080_context_init(struct Context *context, const int mem_size);
 
-void emu_8080_context_free(struct Context* context);
-
 int emu_8080_rst(struct Context* context,int n);
 
 int emu_8080_execute(struct Context* context);

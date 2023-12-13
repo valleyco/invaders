@@ -56,14 +56,14 @@ static inline int inst_8080_lxi(struct Context *context, int op)
 static inline int inst_8080_lda(struct Context *context, int op)
 {
     const int cycles = 13;
-    context->reg[REG_A] = context->memory[fetch_pc_word(context)];
+    context->reg[REG_A] = get_mem_byte(context, fetch_pc_word(context));
     return cycles;
 }
 
 static inline int inst_8080_sta(struct Context *context, int op)
 {
     const int cycles = 13;
-    context->memory[fetch_pc_word(context)] = context->reg[REG_A];
+    set_mem_byte(context, fetch_pc_word(context), context->reg[REG_A]);
     return cycles;
 }
 
@@ -72,8 +72,8 @@ static inline int inst_8080_lhld(struct Context *context, int op)
     const int cycles = 16;
     int addr = fetch_pc_word(context);
     // addr = context->memory[addr] + (context->memory[addr + 1] << 8);
-    context->reg[REG_L] = context->memory[addr];
-    context->reg[REG_H] = context->memory[addr + 1];
+    context->reg[REG_L] = get_mem_byte(context,addr);
+    context->reg[REG_H] = get_mem_byte(context, addr + 1);
     return cycles;
 }
 
@@ -82,8 +82,8 @@ static inline int inst_8080_shld(struct Context *context, int op)
     const int cycles = 16;
     int addr = fetch_pc_word(context);
     // addr = context->memory[addr] + (context->memory[addr + 1] << 8);
-    context->memory[addr] = context->reg[REG_L];
-    context->memory[addr + 1] = context->reg[REG_H];
+    set_mem_byte(context, addr, context->reg[REG_L]);
+    set_mem_byte(context, addr + 1, context->reg[REG_H]);
     return cycles;
 }
 
@@ -100,7 +100,7 @@ static inline int inst_8080_ldax(struct Context *context, int op)
         addr = context->reg[REG_E] + (context->reg[REG_D] << 8);
         break;
     }
-    context->reg[REG_A] = context->memory[addr];
+    context->reg[REG_A] = get_mem_byte(context, addr);
     return cycles;
 }
 
@@ -117,7 +117,7 @@ static inline int inst_8080_stax(struct Context *context, int op)
         addr = context->reg[REG_E] + (context->reg[REG_D] << 8);
         break;
     }
-    context->memory[addr] = context->reg[REG_A];
+    set_mem_byte(context, addr, context->reg[REG_A]);
     return cycles;
 }
 
@@ -569,8 +569,8 @@ static inline int inst_8080_push(struct Context *context, int op)
     const int cycles = 11;
     if (op == 0b11110101)
     {
-        context->memory[--context->SP] = context->reg[REG_A];
-        context->memory[--context->SP] = pack_flags(context);
+        set_mem_byte(context, --context->SP, context->reg[REG_A]);
+        set_mem_byte(context, --context->SP, pack_flags(context));
     }
     else
     {
@@ -585,8 +585,8 @@ static inline int inst_8080_pop(struct Context *context, int op)
     const int cycles = 10;
     if (op == 0b11110001)
     {
-        int flags = context->memory[context->SP++];
-        context->reg[REG_A] = context->memory[context->SP++];
+        int flags = get_mem_byte(context,context->SP++);
+        context->reg[REG_A] = get_mem_byte(context,context->SP++);
         unpack_flags(context, flags);
     }
     else
@@ -601,11 +601,11 @@ static inline int inst_8080_xthl(struct Context *context, int op)
 {
     const int cycles = 18;
     reg8_t tmp;
-    tmp = context->memory[context->SP];
-    context->memory[context->SP] = context->reg[REG_L];
+    tmp = get_mem_byte(context,context->SP);
+    set_mem_byte(context,context->SP, context->reg[REG_L]);
     context->reg[REG_L] = tmp;
-    tmp = context->memory[context->SP + 1];
-    context->memory[context->SP + 1] = context->reg[REG_H];
+    tmp = get_mem_byte(context,context->SP + 1);
+    set_mem_byte(context,context->SP+ 1, context->reg[REG_H]);
     context->reg[REG_H] = tmp;
     return cycles;
 }
@@ -1434,14 +1434,4 @@ int emu_8080_execute(struct Context *context)
         return inst_8080_rst(context, 0xff);
     }
     return 0;
-}
-
-void emu_8080_reset(struct Context *context, const int mem_size)
-{
-    context->memory = (unsigned char *)malloc(mem_size);
-}
-
-void emu_8080_context_free(struct Context *context)
-{
-    free(context->memory);
 }
