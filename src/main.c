@@ -27,7 +27,7 @@ static void on_window_main_destroy(GtkWidget *window, GApplication *app)
     g_application_quit(app);
 }
 */
-gboolean emu_key_function(GtkWidget *widget, GdkEventKey *event, gpointer data)
+static gboolean emu_key_function(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
     struct Emulator *emu = (struct Emulator *)data;
     return emu_handle_keyboard(emu,event->keyval,event->type == GDK_KEY_PRESS);

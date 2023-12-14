@@ -44,11 +44,7 @@ struct Emulator
 };
 
 struct Emulator *emu_new();
-void emu_set_mem(struct Emulator *emulator, int pos, int length, char *data);
-void emu_get_mem(struct Emulator *emulator, int pos, int length, char *buffer);
 void emu_free(struct Emulator *emulator);
 void emu_event_add(struct Emulator *emulator, struct Event event);
 int emu_execute(struct Emulator *emulator, int clocks_ticks);
-size_t load_rom(struct Emulator *emulator, const char* filename);
 int emu_handle_keyboard(struct Emulator *emulator, int keyVal, int isPressed);
-void emu_register_device(struct Emulator *emulator, struct PortDevice *device, int startPort);

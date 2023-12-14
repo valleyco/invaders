@@ -6,16 +6,6 @@ static int port_bit_map[3][8] = {
     {KEY_DIP_3, KEY_DIP_5, KEY_TILT, KEY_DIP_6, KEY_P2_SHOT, KEY_P2_LEFT, KEY_P2_RIGHT, KEY_DIP_6},
 };
 
-static int get_key_action(int keyVal);
-
-int handle_keyboard_event(struct KeyboardDevice *device, int keyVal, int pressed)
-{
-    int key = get_key_action(keyVal);
-    device->key_status[key] = pressed ? 1 : 0;
-    printf("handle_keyboard_event key: %d -> %d\n", keyVal, key);
-    return key > 0;
-}
-
 static int emu_keyboard_read(struct KeyboardDevice *dev, int v_port)
 {
     int result = 0;
@@ -39,10 +29,7 @@ struct KeyboardDevice *emu_keyboard_init()
     dev->portCount = 3;
     dev->read = port_read_array;
     dev->write = port_write_array;
-    for (int i; i < KEY_MAX_ID + 1; i++)
-    {
-        dev->key_status[i] = 0;
-    }
+    memset(dev->key_status, 0, sizeof(dev->key_status));
     dev->key_status[KEY_VIRTUAL_ON] = 1;
     return dev;
 }
@@ -84,10 +71,17 @@ static int get_key_action(int keyVal)
         return KEY_LEFT;
     case GDK_KEY_Right:
         return KEY_RIGHT;
-    case GDK_KEY_I:    
+    case GDK_KEY_I:
     case GDK_KEY_i:
-        return KEY_CREDIT;    
+        return KEY_CREDIT;
     default:
         return 0;
     }
+}
+
+int handle_keyboard_event(struct KeyboardDevice *device, int keyVal, int pressed)
+{
+    int key = get_key_action(keyVal);
+    device->key_status[key] = pressed ? 1 : 0;
+    return key > 0;
 }

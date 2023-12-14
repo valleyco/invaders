@@ -2,7 +2,7 @@
 #include <string.h>
 #include "utils.h"
 #include <stdlib.h>
-#include<stdio.h>
+#include <stdio.h>
 void set_app_folder(const char *app, char *folder)
 {
     char *ts1 = strdup(app);

@@ -7,6 +7,9 @@
 #include "emu-keyboard.h"
 #include "emu-shifter.h"
 
+static void emu_register_device(struct Emulator *emulator, struct PortDevice *device, int startPort);
+static size_t load_rom(struct Emulator *emulator, const char* filename);
+
 struct Emulator *emu_new()
 {
     struct Emulator *emulator = (struct Emulator *)malloc(sizeof(struct Emulator));
@@ -36,7 +39,7 @@ struct Emulator *emu_new()
     return emulator;
 }
 
-void emu_register_device(struct Emulator *emulator, struct PortDevice *device, int startPort)
+static void emu_register_device(struct Emulator *emulator, struct PortDevice *device, int startPort)
 {
     device->portOffset = startPort;
     for (int n = 0; n < device->portCount; n++)
@@ -62,22 +65,6 @@ void emu_register_device(struct Emulator *emulator, struct PortDevice *device, i
     }
 }
 
-void emu_set_mem(struct Emulator *emulator, int pos, int length, char *data)
-{
-    for (int i = 0; i < length; i++)
-    {
-        emulator->memory[i + pos] = data[i];
-    }
-}
-
-void emu_get_mem(struct Emulator *emulator, int pos, int length, char *buffer)
-{
-    for (int i = 0; i < length; i++)
-    {
-        buffer[i] = emulator->memory[i + pos];
-    }
-}
-
 void emu_free(struct Emulator *emulator)
 {
     free(emulator->context);
@@ -95,6 +82,7 @@ void emu_event_add(struct Emulator *emulator, struct Event event)
     emulator->event_queue.event_count++;
     emulator->event_queue.event[(emulator->event_queue.event_head++) % 0x0F] = event;
 }
+
 static void emu_event_drop(struct Emulator *emulator)
 {
     emulator->event_queue.event_count--;
@@ -129,7 +117,7 @@ int emu_execute(struct Emulator *emulator, int clocks_ticks)
     return ticks;
 }
 
-size_t load_rom(struct Emulator *emulator, const char *romDir)
+static size_t load_rom(struct Emulator *emulator, const char *romDir)
 {
     char *ext[] = {"h", "g", "f", "e", 0};
     char filename[255];

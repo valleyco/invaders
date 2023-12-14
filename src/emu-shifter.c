@@ -2,17 +2,17 @@
 #include <stddef.h>
 #include "emu-shifter.h"
 
-void emu_shifter_write_data(struct ShifterDevice *dev, int vp, int value)
+static void emu_shifter_write_data(struct ShifterDevice *dev, int vp, int value)
 {
     dev->shift_register = (dev->shift_register >> 8) | (value << 8);
 }
 
-void emu_shifter_write_shifts(struct ShifterDevice *dev, int vp, int value)
+static void emu_shifter_write_shifts(struct ShifterDevice *dev, int vp, int value)
 {
     dev->shift_amount = value & 7;
 }
 
-int emu_shifter_read_data(struct ShifterDevice *dev, int vp)
+static int emu_shifter_read_data(struct ShifterDevice *dev, int vp)
 {
     return dev->shift_register >> (8 - dev->shift_amount);
 }
