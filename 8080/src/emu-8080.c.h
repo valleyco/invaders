@@ -5,7 +5,8 @@
 extern inline void set_mem_byte(struct Context *context, int addr, reg8_t val)
 {
     addr = addr & context->address_mask;
-    if(addr >= context->rom_size){
+    if (addr >= context->rom_size)
+    {
         context->memory[addr & context->address_mask] = val & 0xFF;
     }
 }
@@ -59,37 +60,21 @@ extern inline int check_condition(struct Context *context, int op)
     switch ((op >> 3) & 0x7)
     {
     case C_NZ:
-        if (!context->flag[Z_FLAG])
-            return 1;
-        break;
+        return !context->flag[Z_FLAG];
     case C_Z:
-        if (context->flag[Z_FLAG])
-            return 1;
-        break;
+        return context->flag[Z_FLAG];
     case C_NC:
-        if (!context->flag[C_FLAG])
-            return 1;
-        break;
+        return !context->flag[C_FLAG];
     case C_C:
-        if (context->flag[C_FLAG])
-            return 1;
-        break;
+        return context->flag[C_FLAG];
     case C_PO:
-        if (!context->flag[P_FLAG])
-            return 1;
-        break;
+        return !context->flag[P_FLAG];
     case C_PE:
-        if (context->flag[P_FLAG])
-            return 1;
-        break;
+        return context->flag[P_FLAG];
     case C_P:
-        if (!context->flag[S_FLAG])
-            return 1;
-        break;
+        return !context->flag[S_FLAG];
     case C_M:
-        if (context->flag[S_FLAG])
-            return 1;
-        break;
+        return context->flag[S_FLAG];
     }
     return 0;
 }
