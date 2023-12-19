@@ -575,7 +575,7 @@ static inline int inst_8080_push(struct Context *context, int op)
     else
     {
         context->SP -= 2;
-        set_mem_word(context, context->SP, get_rp_val(context, op & 0x30));
+        set_mem_word(context, context->SP, get_rp_val(context, op));
     }
     return cycles;
 }
@@ -591,7 +591,7 @@ static inline int inst_8080_pop(struct Context *context, int op)
     }
     else
     {
-        set_rp_val(context, op & 0x30, get_mem_word(context, context->SP));
+        set_rp_val(context, op, get_mem_word(context, context->SP));
         context->SP += 2;
     }
     return cycles;

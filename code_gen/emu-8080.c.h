@@ -112,7 +112,7 @@ extern inline reg8_t get_reg_val(struct Context *context, int reg)
 
 extern inline reg16_t get_rp_val(struct Context *context, int rp)
 {
-    switch (rp)
+    switch (rp & 0x30)
     {
     case RP_BC:
         return context->reg[REG_C] | (context->reg[REG_B] << 8);
@@ -126,7 +126,7 @@ extern inline reg16_t get_rp_val(struct Context *context, int rp)
 }
 extern inline void set_rp_val(struct Context *context, int rp, reg16_t val)
 {
-    switch (rp)
+    switch (rp & 0x30)
     {
     case RP_BC:
         context->reg[REG_C] = val & 0xff;

@@ -40,21 +40,6 @@ extern inline int fetch_pc_word(struct Context *context)
     return word | (fetch_pc_byte(context) << 8);
 }
 
-extern inline int get_source_reg(int op)
-{
-    return op & 0x7;
-}
-
-extern inline int get_destination_reg(int op)
-{
-    return (op >> 3) & 0x7;
-}
-
-extern inline int get_rp(int op)
-{
-    return (op >> 4) & 0x3;
-}
-
 extern inline int check_condition(struct Context *context, int op)
 {
     switch ((op >> 3) & 0x7)
@@ -105,7 +90,7 @@ extern inline reg8_t get_reg_val(struct Context *context, int reg)
 
 extern inline reg16_t get_rp_val(struct Context *context, int rp)
 {
-    switch (rp)
+    switch (rp & 0x30)
     {
     case RP_BC:
         return context->reg[REG_C] | (context->reg[REG_B] << 8);
@@ -117,9 +102,10 @@ extern inline reg16_t get_rp_val(struct Context *context, int rp)
         return context->SP;
     }
 }
+
 extern inline void set_rp_val(struct Context *context, int rp, reg16_t val)
 {
-    switch (rp)
+    switch (rp & 0x30)
     {
     case RP_BC:
         context->reg[REG_C] = val & 0xff;
