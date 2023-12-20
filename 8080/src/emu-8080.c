@@ -177,7 +177,6 @@ static inline int inst_8080_aci(struct Context *context, int op)
 static inline void inst_8080_sub_common(struct Context *context, reg8_t val, int c)
 {
     int result = context->reg[REG_A] - val - c;
-    //    printf("-------> result:%i %i %i\n",context->reg[REG_A],result, val);
     context->flag[A_FLAG] = ((context->reg[REG_A] & 0x0f) + ((val + c) & 0x0f)) > 0xf;
     context->reg[REG_A] = result & 0xff;
     update_flags(context, result, 1);
@@ -220,8 +219,7 @@ static inline int inst_8080_inr(struct Context *context, int op)
     const int cycles = 5;
     const int reg = (op >> 3) & 0x07;
     int val = get_reg_val(context, reg);
-    // printf("reg %i, value: %i\n",reg, val);
-    context->flag[A_FLAG] = (val & 0xf) == 0xf ? 1 : 0;
+    context->flag[A_FLAG] = (val & 0xf) == 0xf;
     val++;
     set_reg_val(context, reg, val);
     update_flags(context, val, 0);
@@ -233,7 +231,7 @@ static inline int inst_8080_dcr(struct Context *context, int op)
     const int cycles = 5;
     const int reg = (op >> 3) & 0x07;
     int val = get_reg_val(context, reg);
-    context->flag[A_FLAG] = (val & 0xf) == 0x0 ? 1 : 0;
+    context->flag[A_FLAG] = (val & 0x10) == 0x10;
     val--;
     set_reg_val(context, reg, val);
     update_flags(context, val, 0);
@@ -317,7 +315,7 @@ static inline int inst_8080_dad(struct Context *context, int op)
     }
     context->reg[REG_L] = val & 0xff;
     context->reg[REG_H] = (val >> 8) & 0xff;
-    context->flag[C_FLAG] = (val & 0xf0000) ? 1 : 0;
+    context->flag[C_FLAG] = val >> 16;
     return cycles;
 }
 
@@ -357,6 +355,7 @@ static inline int inst_8080_ani(struct Context *context, int op)
     context->flag[A_FLAG] = ((val | context->reg[REG_A]) & 0x08) >> 3; // from the 8080/8085 manual ....
     context->reg[REG_A] &= val;
     update_flags(context, context->reg[REG_A], 0);
+    context->flag[A_FLAG] = 0;
     context->flag[C_FLAG] = 0;
     return cycles;
 }
@@ -397,9 +396,8 @@ static inline int inst_8080_xra(struct Context *context, int op)
 static inline int inst_8080_xri(struct Context *context, int op)
 {
     const int cycles = 7;
-    int val = context->reg[REG_A] ^ fetch_pc_byte(context);
-    context->reg[REG_A] = val;
-    update_flags(context, val, 0);
+    context->reg[REG_A] ^= fetch_pc_byte(context);
+    update_flags(context, context->reg[REG_A] , 0);
     context->flag[C_FLAG] = 0;
     context->flag[A_FLAG] = 0;
     return cycles;
