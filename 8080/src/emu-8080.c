@@ -72,7 +72,7 @@ static inline int inst_8080_lhld(struct Context *context, int op)
     const int cycles = 16;
     int addr = fetch_pc_word(context);
     // addr = context->memory[addr] + (context->memory[addr + 1] << 8);
-    context->reg[REG_L] = get_mem_byte(context,addr);
+    context->reg[REG_L] = get_mem_byte(context, addr);
     context->reg[REG_H] = get_mem_byte(context, addr + 1);
     return cycles;
 }
@@ -177,7 +177,7 @@ static inline int inst_8080_aci(struct Context *context, int op)
 static inline void inst_8080_sub_common(struct Context *context, reg8_t val, int c)
 {
     int result = context->reg[REG_A] - val - c;
-    context->flag[A_FLAG] = ((context->reg[REG_A] & 0x0f) + ((val + c) & 0x0f)) > 0xf;
+    //context->flag[A_FLAG] = ((context->reg[REG_A] & 0x0f) + ((val + c) & 0x0f)) > 0xf;
     context->reg[REG_A] = result & 0xff;
     update_flags(context, result, 1);
 }
@@ -397,7 +397,7 @@ static inline int inst_8080_xri(struct Context *context, int op)
 {
     const int cycles = 7;
     context->reg[REG_A] ^= fetch_pc_byte(context);
-    update_flags(context, context->reg[REG_A] , 0);
+    update_flags(context, context->reg[REG_A], 0);
     context->flag[C_FLAG] = 0;
     context->flag[A_FLAG] = 0;
     return cycles;
@@ -499,7 +499,9 @@ static inline int inst_8080_j(struct Context *context, int op)
     if (check_condition(context, op))
     {
         context->PC = fetch_pc_word(context);
-    } else {
+    }
+    else
+    {
         context->PC += 2;
     }
     return cycles;
@@ -521,7 +523,9 @@ static inline int inst_8080_c(struct Context *context, int op)
     if (check_condition(context, op))
     {
         inst_8080_call(context, op);
-    } else {
+    }
+    else
+    {
         context->PC += 2;
     }
     return cycles;
@@ -583,8 +587,8 @@ static inline int inst_8080_pop(struct Context *context, int op)
     const int cycles = 10;
     if (op == 0b11110001)
     {
-        int flags = get_mem_byte(context,context->SP++);
-        context->reg[REG_A] = get_mem_byte(context,context->SP++);
+        int flags = get_mem_byte(context, context->SP++);
+        context->reg[REG_A] = get_mem_byte(context, context->SP++);
         unpack_flags(context, flags);
     }
     else
@@ -599,11 +603,11 @@ static inline int inst_8080_xthl(struct Context *context, int op)
 {
     const int cycles = 18;
     reg8_t tmp;
-    tmp = get_mem_byte(context,context->SP);
-    set_mem_byte(context,context->SP, context->reg[REG_L]);
+    tmp = get_mem_byte(context, context->SP);
+    set_mem_byte(context, context->SP, context->reg[REG_L]);
     context->reg[REG_L] = tmp;
-    tmp = get_mem_byte(context,context->SP + 1);
-    set_mem_byte(context,context->SP+ 1, context->reg[REG_H]);
+    tmp = get_mem_byte(context, context->SP + 1);
+    set_mem_byte(context, context->SP + 1, context->reg[REG_H]);
     context->reg[REG_H] = tmp;
     return cycles;
 }
@@ -626,7 +630,7 @@ static inline int inst_8080_in(struct Context *context, int op)
 static inline int inst_8080_out(struct Context *context, int op)
 {
     const int cycles = 10;
-    context->port_write(context->gData,fetch_pc_byte(context), context->reg[REG_A]);
+    context->port_write(context->gData, fetch_pc_byte(context), context->reg[REG_A]);
     return cycles;
 }
 
@@ -671,7 +675,7 @@ int emu_8080_rst(struct Context *context, int n)
 int emu_8080_execute(struct Context *context)
 {
     int opcode = fetch_pc_byte(context);
-    //printf("opcode %x \n", opcode);
+    // printf("opcode %x \n", opcode);
     switch (opcode)
     {
     case 0x00:
@@ -723,7 +727,7 @@ int emu_8080_execute(struct Context *context)
 
     case 0x10:
         return inst_8080_illegal(context, 0x10);
-   
+
     case 0x11:
         return inst_8080_lxi(context, 0x11);
 

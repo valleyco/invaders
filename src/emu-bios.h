@@ -1,3 +1,4 @@
 #pragma once
+#include <stdbool.h>
 #include "emu-8080.h"
-int bios_trap(struct Context *context);
+bool bios_trap(struct Context *context);
