@@ -14,8 +14,8 @@ static int emu_keyboard_read(struct KeyboardDevice *dev, int v_port)
         result <<= 1;
         result |= dev->key_status[port_bit_map[v_port][i]];
     }
-    if (result && result != 8)
-        printf("in %d -> %d\n", v_port, result);
+    // if (result && result != 8)
+    //     printf("in %d -> %d\n", v_port, result);
     return result;
 }
 
