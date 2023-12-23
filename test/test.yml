@@ -758,4 +758,14 @@
     - dad hl
   expected:
     registers:
-      l: 2      
+      l: 2
+- name: test XRA
+  code:
+    - xra a
+    - hlt
+  expected:
+    flags:
+      s: 0
+      z: 1
+      p: 1
+      c: 0  

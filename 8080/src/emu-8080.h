@@ -53,14 +53,21 @@ struct Context
     int halt;
     int interrupt;
     unsigned char *memory;
-    int (*port_read)(void*g, int p);
-    void (*port_write)(void*g, int p, int v);
+    int (*port_read)(void *g, int p);
+    void (*port_write)(void *g, int p, int v);
     int address_mask;
     int rom_size;
     reg8_t M;
     void *gData;
 };
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-int emu_8080_rst(struct Context *context, int n);
+    int emu_8080_rst(struct Context *context, int n);
 
-int emu_8080_execute(struct Context *context);
+    int emu_8080_execute(struct Context *context);
+#ifdef __cplusplus
+}
+#endif

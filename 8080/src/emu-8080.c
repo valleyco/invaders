@@ -177,7 +177,7 @@ static inline int inst_8080_aci(struct Context *context, int op)
 static inline void inst_8080_sub_common(struct Context *context, reg8_t val, int c)
 {
     int result = context->reg[REG_A] - val - c;
-    //context->flag[A_FLAG] = ((context->reg[REG_A] & 0x0f) + ((val + c) & 0x0f)) > 0xf;
+    // context->flag[A_FLAG] = ((context->reg[REG_A] & 0x0f) + ((val + c) & 0x0f)) > 0xf;
     context->reg[REG_A] = result & 0xff;
     update_flags(context, result, 1);
 }
@@ -675,7 +675,6 @@ int emu_8080_rst(struct Context *context, int n)
 int emu_8080_execute(struct Context *context)
 {
     int opcode = fetch_pc_byte(context);
-    // printf("opcode %x \n", opcode);
     switch (opcode)
     {
     case 0x00:

@@ -101,6 +101,7 @@ extern inline reg16_t get_rp_val(struct Context *context, int rp)
     case RP_SP:
         return context->SP;
     }
+    return 0; //will never happened but to prevent error: control reaches end of non-void function [-Werror=return-type] 
 }
 
 extern inline void set_rp_val(struct Context *context, int rp, reg16_t val)
@@ -111,8 +112,8 @@ extern inline void set_rp_val(struct Context *context, int rp, reg16_t val)
         context->reg[REG_C] = val & 0xff;
         context->reg[REG_B] = (val >> 8) & 0xff;
         break;
+    
     case RP_DE:
-
         context->reg[REG_E] = val & 0xff;
         context->reg[REG_D] = (val >> 8) & 0xff;
         break;
@@ -159,14 +160,12 @@ extern inline void update_flags(struct Context *context, int val, int inc_c)
 
 extern inline int pack_flags(struct Context *context)
 {
-    return context->flag[C_FLAG] ? 0x01 : 0 | 1                   ? 0x02
-                                      : 0 | context->flag[P_FLAG] ? 0x04
-                                      : 0 | 0                     ? 0x08
-                                      : 0 | context->flag[A_FLAG] ? 0x10
-                                      : 0 | 0                     ? 0x20
-                                      : 0 | context->flag[Z_FLAG] ? 0x40
-                                      : 0 | context->flag[S_FLAG] ? 0x80
-                                                                  : 0;
+    return 0x02 |
+        (context->flag[C_FLAG] ? 0x01 : 0) | 
+        (context->flag[P_FLAG] ? 0x04 : 0) | 
+        (context->flag[A_FLAG] ? 0x10 : 0) | 
+        (context->flag[Z_FLAG] ? 0x40 : 0) | 
+        (context->flag[S_FLAG] ? 0x80 : 0);
 }
 
 extern inline void unpack_flags(struct Context *context, int flags)

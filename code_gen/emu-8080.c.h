@@ -180,15 +180,12 @@ extern inline void update_flags(struct Context *context, int val, int inc_c)
 
 extern inline int pack_flags(struct Context *context)
 {
-    return
-        context->flag[C_FLAG] ? 0x01 : 0 |
-                            1 ? 0x02 : 0 | 
-        context->flag[P_FLAG] ? 0x04 : 0 | 
-                            0 ? 0x08 : 0 | 
-        context->flag[A_FLAG] ? 0x10 : 0 | 
-                            0 ? 0x20 : 0 | 
-        context->flag[Z_FLAG] ? 0x40 : 0 | 
-        context->flag[S_FLAG] ? 0x80 : 0;
+    return 0x02 |
+        (context->flag[C_FLAG] ? 0x01 : 0) | 
+        (context->flag[P_FLAG] ? 0x04 : 0) | 
+        (context->flag[A_FLAG] ? 0x10 : 0) | 
+        (context->flag[Z_FLAG] ? 0x40 : 0) | 
+        (context->flag[S_FLAG] ? 0x80 : 0);
 }
 
 extern inline void unpack_flags(struct Context *context, int flags)
