@@ -6,7 +6,7 @@ static int port_bit_map[3][8] = {
     {KEY_DIP_3, KEY_DIP_5, KEY_TILT, KEY_DIP_6, KEY_P2_SHOT, KEY_P2_LEFT, KEY_P2_RIGHT, KEY_DIP_6},
 };
 
-static int emu_keyboard_read(struct KeyboardDevice *dev, int v_port)
+static int emu_keyboard_read(KeyboardDevice *dev, int v_port)
 {
     int result = 0;
     for (int i = 7; i >= 0; i--)
@@ -18,23 +18,25 @@ static int emu_keyboard_read(struct KeyboardDevice *dev, int v_port)
     //     printf("in %d -> %d\n", v_port, result);
     return result;
 }
+typedef int (*PORT_READ)(void *, int);
+typedef void (*PORT_WRITE)(void *, int, int);
 
-static int (*port_read_array[])(void *g, int p) = {emu_keyboard_read, emu_keyboard_read, emu_keyboard_read};
+static int (*port_read_array[])(KeyboardDevice *g, int p) = {emu_keyboard_read, emu_keyboard_read, emu_keyboard_read};
 
-static void (*port_write_array[])(void *g, int p, int v) = {NULL, NULL, NULL};
+static void (*port_write_array[])(KeyboardDevice *g, int p, int v) = {NULL, NULL, NULL};
 
-struct KeyboardDevice *emu_keyboard_init()
+KeyboardDevice *emu_keyboard_init()
 {
-    struct KeyboardDevice *dev = malloc(sizeof(struct KeyboardDevice));
+    KeyboardDevice *dev = malloc(sizeof(KeyboardDevice));
     dev->portCount = 3;
-    dev->read = port_read_array;
-    dev->write = port_write_array;
+    dev->read = (PORT_READ *)port_read_array;
+    dev->write = (PORT_WRITE *)port_write_array;
     memset(dev->key_status, 0, sizeof(dev->key_status));
     dev->key_status[KEY_VIRTUAL_ON] = 1;
     return dev;
 }
 
-void emu_keyboard_done(struct KeyboardDevice *dev)
+void emu_keyboard_done(KeyboardDevice *dev)
 {
     free(dev);
 }
@@ -79,7 +81,7 @@ static int get_key_action(int keyVal)
     }
 }
 
-int handle_keyboard_event(struct KeyboardDevice *device, int keyVal, int pressed)
+int handle_keyboard_event(KeyboardDevice *device, int keyVal, int pressed)
 {
     int key = get_key_action(keyVal);
     device->key_status[key] = pressed ? 1 : 0;

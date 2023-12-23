@@ -18,13 +18,15 @@ bool bios_trap(struct Context *context)
             printf("%c", context->reg[REG_C]);
             break;
         case BDOS_C_WRITESTR:
+        {
             reg8_t ch;
             int addr = (context->reg[REG_D] << 8) | context->reg[REG_E];
             while ((ch = context->memory[addr++ & 0XFFFF]) != '$')
             {
                 printf("%c", ch);
             }
-            break;
+        }
+        break;
         default:
             return false;
         }

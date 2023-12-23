@@ -1,6 +1,6 @@
 #include "emu-ports.h"
 
-int port_read(struct Emulator *emu, int p)
+int port_read(Emulator *emu, int p)
 {
     struct PortDevice *dev;
     if ((dev = emu->dev_read[p]))
@@ -11,7 +11,7 @@ int port_read(struct Emulator *emu, int p)
     return 0;
 }
 
-void port_write(struct Emulator *emu, int p, int v)
+void port_write(Emulator *emu, int p, int v)
 {
     struct PortDevice *dev;
     if ((dev = emu->dev_write[p]))

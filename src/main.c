@@ -16,8 +16,7 @@
 static GdkPixbuf *pixbuf;
 static GtkImage *screenImage;
 static gint64 emu_cycle_last_run;
-struct Emulator *emu;
-static char app_dir[PATH_MAX];
+Emulator *emu;
 
 // called when window is closed
 /*
@@ -27,10 +26,11 @@ static void on_window_main_destroy(GtkWidget *window, GApplication *app)
     g_application_quit(app);
 }
 */
-static gboolean emu_key_function(GtkWidget *widget, GdkEventKey *event, gpointer data)
+static gboolean emu_key_function(GtkWidget *gtkWidget, GdkEventKey *event, gpointer data)
 {
-    struct Emulator *emu = (struct Emulator *)data;
-    return emu_handle_keyboard(emu,event->keyval,event->type == GDK_KEY_PRESS);
+    (void)gtkWidget;
+    Emulator *emu = (Emulator *)data;
+    return emu_handle_keyboard(emu, event->keyval, event->type == GDK_KEY_PRESS);
 }
 
 /*
@@ -39,7 +39,7 @@ static gboolean emu_key_function(GtkWidget *widget, GdkEventKey *event, gpointer
 */
 static gboolean emulation_update(gpointer user_data)
 {
-    struct Emulator *em = (struct Emulator *)user_data;
+    Emulator *em = (Emulator *)user_data;
     gint64 now = g_get_monotonic_time() / 1000;
     gint64 diff = now - emu_cycle_last_run; // find how much time we need to cover in miliseconds
     int cycles = (CPU_8080_HZ / 1000) * diff;
@@ -75,8 +75,11 @@ static void on_app_activate(GtkApplication *app, GtkBuilder *builder)
 int main(int argc, char *argv[])
 {
     // create new GtkApplication with an unique application ID
-    set_app_folder(argv[0], 0);
-    GtkApplication *app = gtk_application_new("valleyco.emu.i8080", G_APPLICATION_FLAGS_NONE);
+ #ifdef G_APPLICATION_DEFAULT_FLAGS
+   GtkApplication *app = gtk_application_new("valleyco.emu.i8080", G_APPLICATION_DEFAULT_FLAGS);
+#else
+	GtkApplication *app=gtk_application_new(NULL,G_APPLICATION_FLAGS_NONE);
+#endif
     GtkBuilder *builder = gtk_builder_new();
     emu = emu_new();
 

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "emu-screen.h"
 
-static void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf)
+void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf)
 {
     const int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);
     const int pixbuf_rowstride_diff = gdk_pixbuf_get_rowstride(pixbuf) - (SCREEN_WIDTH * pixbuf_n_channels);
@@ -32,7 +32,7 @@ static void do_update_buffer_flip(const unsigned char *buffer, const GdkPixbuf *
 {
     const unsigned char *p_image = buffer;
 
-    const guchar *pixbuf_pixels = gdk_pixbuf_get_pixels(pixbuf);
+    guchar *pixbuf_pixels = gdk_pixbuf_get_pixels(pixbuf);
     const int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);
     const int pixbuf_rowstride = gdk_pixbuf_get_rowstride(pixbuf);
     guchar *target = pixbuf_pixels + pixbuf_rowstride * (SCREEN_WIDTH - 1);
@@ -56,7 +56,7 @@ static void do_update_buffer_flip(const unsigned char *buffer, const GdkPixbuf *
     }
 }
 
-void update_pixbuffer(struct Emulator *emu, GdkPixbuf *pixbuf)
+void update_pixbuffer(Emulator *emu, GdkPixbuf *pixbuf)
 {
     do_update_buffer_flip(emu->memory + SCREEN_BUFFER_LOCATION, pixbuf);
 }
