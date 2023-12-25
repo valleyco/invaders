@@ -75,7 +75,7 @@ static void on_app_activate(GtkApplication *app, GtkBuilder *builder)
 int main(int argc, char *argv[])
 {
     // create new GtkApplication with an unique application ID
- #ifdef G_APPLICATION_DEFAULT_FLAGS
+#if GLIB_CHECK_VERSION(2, 74, 0)
    GtkApplication *app = gtk_application_new("valleyco.emu.i8080", G_APPLICATION_DEFAULT_FLAGS);
 #else
 	GtkApplication *app=gtk_application_new(NULL,G_APPLICATION_FLAGS_NONE);
