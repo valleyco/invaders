@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 #if GLIB_CHECK_VERSION(2, 74, 0)
    GtkApplication *app = gtk_application_new("valleyco.emu.i8080", G_APPLICATION_DEFAULT_FLAGS);
 #else
-	GtkApplication *app=gtk_application_new(NULL,G_APPLICATION_FLAGS_NONE);
+	GtkApplication *app=gtk_application_new("valleyco.emu.i8080",G_APPLICATION_FLAGS_NONE);
 #endif
     GtkBuilder *builder = gtk_builder_new();
     emu = emu_new();
