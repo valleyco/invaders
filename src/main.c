@@ -14,6 +14,7 @@
 #include "emu-ports.h"
 
 static GdkPixbuf *pixbuf;
+static GdkPixbuf *scaledPixbuf ;
 static GtkImage *screenImage;
 static gint64 emu_cycle_last_run;
 Emulator *emu;
@@ -50,8 +51,8 @@ static gboolean emulation_update(gpointer user_data)
     emu_cycle_last_run = now;
     // update the screen
     update_pixbuffer(em, pixbuf);
-    gtk_image_set_from_pixbuf(screenImage, pixbuf);
-
+    gdk_pixbuf_scale(pixbuf, scaledPixbuf, 0, 0, SCREEN_HEIGHT * 3, SCREEN_WIDTH * 3, 0, 0, 3, 3, GDK_INTERP_BILINEAR);
+    gtk_image_set_from_pixbuf(screenImage, scaledPixbuf);
     //   printf("\rtime elapsed %li, %i                               \r", diff, cycles);
     return TRUE;
     ;
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
     g_signal_connect(app, "activate", G_CALLBACK(on_app_activate), builder);
 
     pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_HEIGHT, SCREEN_WIDTH); // we rotate the image so we swap the screen dimensions
-
+    scaledPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_HEIGHT * 3, SCREEN_WIDTH * 3);
     // start the application, terminate by closing the window
     // GtkApplication* is upcast to GApplication* with G_APPLICATION() macro
     g_timeout_add(100, emulation_update, emu);
@@ -94,6 +95,7 @@ int main(int argc, char *argv[])
     // deallocate the application object
     emu_free(emu);
     g_object_unref(pixbuf);
+    g_object_unref(scaledPixbuf);
     g_object_unref(builder);
     g_object_unref(app);
     return status;
