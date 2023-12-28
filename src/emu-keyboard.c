@@ -45,12 +45,15 @@ static int get_key_action(int keyVal)
 {
     switch (keyVal)
     {
+    case GDK_KEY_Left:
     case GDK_KEY_Z:
     case GDK_KEY_z:
         return KEY_P1_LEFT;
     case GDK_KEY_X:
     case GDK_KEY_x:
+    case GDK_KEY_space:
         return KEY_P1_SHOT;
+    case GDK_KEY_Right:
     case GDK_KEY_C:
     case GDK_KEY_c:
         return KEY_P1_RIGHT;
@@ -67,12 +70,12 @@ static int get_key_action(int keyVal)
         return KEY_P1_START;
     case GDK_KEY_2:
         return KEY_P2_START;
-    case GDK_KEY_space:
-        return KEY_SHOT;
-    case GDK_KEY_Left:
-        return KEY_LEFT;
-    case GDK_KEY_Right:
-        return KEY_RIGHT;
+    // case GDK_KEY_space:
+    //     return KEY_SHOT;
+    // case GDK_KEY_Left:
+    //     return KEY_LEFT;
+    // case GDK_KEY_Right:
+    //     return KEY_RIGHT;
     case GDK_KEY_I:
     case GDK_KEY_i:
         return KEY_CREDIT;
