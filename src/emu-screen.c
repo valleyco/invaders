@@ -11,10 +11,9 @@ static void color_rect(const GdkPixbuf *pixbuf, int x, int y, int w, int h, uint
     guchar *pixbuf_pixels = gdk_pixbuf_get_pixels(pixbuf);
     guchar *target = pixbuf_pixels + pixbuf_rowstride * y + x * pixbuf_n_channels;
     guchar *target_end = pixbuf_pixels + pixbuf_rowstride * (y + h) + (x + w) * pixbuf_n_channels;
-
     do
     {
-        for (int c = x; c < x + w; c++)
+        for (guchar *width_end = target + w * pixbuf_n_channels; target < width_end;)
         {
             uint32_t pixel = color;
             for (int s = 0; s < pixbuf_n_channels; s++)
