@@ -3,6 +3,31 @@
 #include "emu.h"
 #include "emu-screen.h"
 
+static void color_rect(const GdkPixbuf *pixbuf, int x, int y, int w, int h, uint32_t color)
+{
+    const int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);
+    const int pixbuf_rowstride = gdk_pixbuf_get_rowstride(pixbuf);
+    const int pixbuf_rowstride_diff = pixbuf_rowstride - (w * pixbuf_n_channels);
+    guchar *pixbuf_pixels = gdk_pixbuf_get_pixels(pixbuf);
+    guchar *target = pixbuf_pixels + pixbuf_rowstride * y + x * pixbuf_n_channels;
+    guchar *target_end = pixbuf_pixels + pixbuf_rowstride * (y + h) + (x + w) * pixbuf_n_channels;
+
+    do
+    {
+        for (int c = x; c < x + w; c++)
+        {
+            uint32_t pixel = color;
+            for (int s = 0; s < pixbuf_n_channels; s++)
+            {
+                *target &= pixel & 0xff;
+                target++;
+                pixel >>= 8;
+            }
+        }
+        target += pixbuf_rowstride_diff;
+    } while (target < target_end);
+}
+
 void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf)
 {
     const int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);
@@ -54,6 +79,9 @@ static void do_update_buffer_flip(const unsigned char *buffer, const GdkPixbuf *
         }
         target += pixbuf_rowstride * SCREEN_WIDTH + pixbuf_n_channels;
     }
+    color_rect(pixbuf, 0, 32, 224, 32, 0x0000FF);   // RED
+    color_rect(pixbuf, 0, 184, 224, 56, 0x00FF00);  // GREEN
+    color_rect(pixbuf, 16, 240, 118, 16, 0x00FF00); // GREEN
 }
 
 void update_pixbuffer(Emulator *emu, GdkPixbuf *pixbuf)

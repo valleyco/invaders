@@ -14,10 +14,12 @@
 #include "emu-ports.h"
 
 static GdkPixbuf *pixbuf;
-static GdkPixbuf *scaledPixbuf ;
+static GdkPixbuf *scaledPixbuf;
 static GtkImage *screenImage;
 static gint64 emu_cycle_last_run;
 Emulator *emu;
+
+#define SCREEN_SCALE 3
 
 // called when window is closed
 /*
@@ -51,7 +53,7 @@ static gboolean emulation_update(gpointer user_data)
     emu_cycle_last_run = now;
     // update the screen
     update_pixbuffer(em, pixbuf);
-    gdk_pixbuf_scale(pixbuf, scaledPixbuf, 0, 0, SCREEN_HEIGHT * 3, SCREEN_WIDTH * 3, 0, 0, 3, 3, GDK_INTERP_BILINEAR);
+    gdk_pixbuf_scale(pixbuf, scaledPixbuf, 0, 0, SCREEN_HEIGHT * SCREEN_SCALE, SCREEN_WIDTH * SCREEN_SCALE, 0, 0, SCREEN_SCALE, SCREEN_SCALE, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(screenImage, scaledPixbuf);
     //   printf("\rtime elapsed %li, %i                               \r", diff, cycles);
     return TRUE;
@@ -77,9 +79,9 @@ int main(int argc, char *argv[])
 {
     // create new GtkApplication with an unique application ID
 #if GLIB_CHECK_VERSION(2, 74, 0)
-   GtkApplication *app = gtk_application_new("valleyco.emu.i8080", G_APPLICATION_DEFAULT_FLAGS);
+    GtkApplication *app = gtk_application_new("valleyco.emu.i8080", G_APPLICATION_DEFAULT_FLAGS);
 #else
-	GtkApplication *app=gtk_application_new("valleyco.emu.i8080",G_APPLICATION_FLAGS_NONE);
+    GtkApplication *app = gtk_application_new("valleyco.emu.i8080", G_APPLICATION_FLAGS_NONE);
 #endif
     GtkBuilder *builder = gtk_builder_new();
     emu = emu_new();
@@ -87,7 +89,7 @@ int main(int argc, char *argv[])
     g_signal_connect(app, "activate", G_CALLBACK(on_app_activate), builder);
 
     pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_HEIGHT, SCREEN_WIDTH); // we rotate the image so we swap the screen dimensions
-    scaledPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_HEIGHT * 3, SCREEN_WIDTH * 3);
+    scaledPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, 0, 8, SCREEN_HEIGHT * SCREEN_SCALE, SCREEN_WIDTH * SCREEN_SCALE);
     // start the application, terminate by closing the window
     // GtkApplication* is upcast to GApplication* with G_APPLICATION() macro
     g_timeout_add(100, emulation_update, emu);
