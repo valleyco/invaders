@@ -30,6 +30,7 @@ AC_CONFIG_MACRO_DIRS([m4])
 AC_CONFIG_FILES([Makefile 8080/src/Makefile src/Makefile])
 
 PKG_CHECK_MODULES([GTK3],[gtk+-3.0], [], [AC_MSG_ERROR([GTK not in path])])
+PKG_CHECK_MODULES([SDL2],[sdl2], [], [AC_MSG_ERROR([SDL2 not in path])])
 
 # Generate the output
 AC_OUTPUT

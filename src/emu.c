@@ -3,9 +3,8 @@
 #include "emu.h"
 #include "emu-ports.h"
 #include "emu-screen.h"
-
+#include "invaders.rom.h"
 static void emu_register_device(Emulator *emulator, struct PortDevice *device, int startPort);
-static size_t load_rom(Emulator *emulator, const char *filename);
 
 Emulator *emu_new()
 {
@@ -26,13 +25,13 @@ Emulator *emu_new()
     emu_register_device(emulator, (struct PortDevice *)emulator->kbDevice, 0);
     emulator->shiftDevice = emu_shifter_init();
     emu_register_device(emulator, (struct PortDevice *)emulator->shiftDevice, 2);
-
+    emulator->soundDevice = emu_sound_init();
+    emu_register_device(emulator, (struct PortDevice *)emulator->soundDevice, 3);
     emulator->clock_ticks = 0;
     emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
     emulator->screen_int_half = 0;
     emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
-
-    load_rom(emulator, "../rom/");
+    memcpy(emulator->memory,invaders_rom,invaders_rom_len);
     return emulator;
 }
 
@@ -67,6 +66,7 @@ void emu_free(Emulator *emulator)
     free(emulator->context);
     emu_keyboard_done(emulator->kbDevice);
     emu_shifter_done(emulator->shiftDevice);
+    emu_sound_done(emulator->soundDevice);
     free(emulator);
 }
 
@@ -112,22 +112,6 @@ int emu_execute(Emulator *emulator, int clocks_ticks)
     }
     emulator->clock_ticks += ticks;
     return ticks;
-}
-
-static size_t load_rom(Emulator *emulator, const char *romDir)
-{
-    char *ext[] = {"h", "g", "f", "e", 0};
-    char filename[255];
-    for (int i = 0; ext[i]; i++)
-    {
-        sprintf(filename, "%s/invaders.%s", romDir, ext[i]);
-        // printf("%s\n",filename);exit(1);
-        FILE *f = fopen(filename, "r");
-        size_t count = fread(emulator->memory + (i * 2048), 1, 2048, f);
-        printf("rom loaded rom size=%li\n", count);
-        fclose(f);
-    }
-    return 0;
 }
 
 int emu_handle_keyboard(Emulator *emulator, int keyVal, int isPressed)

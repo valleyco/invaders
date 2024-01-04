@@ -4,6 +4,7 @@
 #include "emu-8080.h"
 #include "emu-shifter.h"
 #include "emu-keyboard.h"
+#include "emu-sound.h"
 
 // 100 ms
 #define CPU_8080_HZ 2000000
@@ -44,6 +45,7 @@ typedef struct
     int screen_int_half;
     KeyboardDevice *kbDevice;
     ShifterDevice *shiftDevice;
+    SoundDevice *soundDevice;
 } Emulator;
 
 Emulator *emu_new();

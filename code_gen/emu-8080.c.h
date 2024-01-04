@@ -2,20 +2,36 @@
 
 #include "emu-8080.h"
 
+extern inline void set_mem_byte(struct Context *context, int addr, reg8_t val)
+{
+    addr = addr & context->address_mask;
+    if (addr >= context->rom_size)
+    {
+        context->memory[addr & context->address_mask] = val & 0xFF;
+    }
+}
+
+extern inline reg8_t get_mem_byte(struct Context *context, int addr)
+{
+    return context->memory[addr & context->address_mask];
+}
+
 extern inline void set_mem_word(struct Context *context, int addr, reg16_t val)
 {
-    context->memory[addr] = val & 0xff;
-    context->memory[addr + 1] = val >> 8;
+    set_mem_byte(context, addr, val);
+    set_mem_byte(context, addr + 1, val >> 8);
 }
 
 extern inline reg16_t get_mem_word(struct Context *context, int addr)
 {
-    return context->memory[addr] | (context->memory[addr + 1] << 8);
+    return get_mem_byte(context, addr) | ((int)get_mem_byte(context, addr + 1) << 8);
 }
 
 extern inline int fetch_pc_byte(struct Context *context)
 {
-    return context->memory[(context->PC++ & 0xffff)];
+    int byte = get_mem_byte(context, context->PC);
+    context->PC = (context->PC + 1) & 0xFFFF;
+    return byte;
 }
 
 extern inline int fetch_pc_word(struct Context *context)
@@ -24,62 +40,26 @@ extern inline int fetch_pc_word(struct Context *context)
     return word | (fetch_pc_byte(context) << 8);
 }
 
-extern inline int get_source_reg(int op)
-{
-    return op & 0x7;
-}
-
-extern inline int get_destination_reg(int op)
-{
-    return (op >> 3) & 0x7;
-}
-
-extern inline int get_rp(int op)
-{
-    return (op >> 4) & 0x3;
-}
-
-extern inline int get_condition(int op)
-{
-    return (op >> 3) & 0x7;
-}
-
 extern inline int check_condition(struct Context *context, int op)
 {
-    switch (get_condition(op))
+    switch ((op >> 3) & 0x7)
     {
     case C_NZ:
-        if (!context->flag[Z_FLAG])
-            return 1;
-        break;
+        return !context->flag[Z_FLAG];
     case C_Z:
-        if (context->flag[Z_FLAG])
-            return 1;
-        break;
+        return context->flag[Z_FLAG];
     case C_NC:
-        if (!context->flag[C_FLAG])
-            return 1;
-        break;
+        return !context->flag[C_FLAG];
     case C_C:
-        if (context->flag[C_FLAG])
-            return 1;
-        break;
+        return context->flag[C_FLAG];
     case C_PO:
-        if (!context->flag[P_FLAG])
-            return 1;
-        break;
+        return !context->flag[P_FLAG];
     case C_PE:
-        if (context->flag[P_FLAG])
-            return 1;
-        break;
+        return context->flag[P_FLAG];
     case C_P:
-        if (!context->flag[S_FLAG])
-            return 1;
-        break;
+        return !context->flag[S_FLAG];
     case C_M:
-        if (context->flag[S_FLAG])
-            return 1;
-        break;
+        return context->flag[S_FLAG];
     }
     return 0;
 }
@@ -93,16 +73,14 @@ extern inline int is_parity_even(int b)
 }
 extern inline reg8_t get_m_reg(struct Context *context)
 {
-    // int addr = context->reg[REG_L] + (context->reg[REG_H] << 8);
-    // int m = context->M = context->memory[addr];
-    // printf("addr: %i, content: %i\n",addr, m);
-
-    return context->M = context->memory[context->reg[REG_L] + (context->reg[REG_H] << 8)];
+    const int addr = context->reg[REG_L] | (context->reg[REG_H] << 8);
+    return context->M = get_mem_byte(context, addr);
 }
 
 extern inline void set_m_reg(struct Context *context, reg8_t val)
 {
-    context->memory[context->reg[REG_L] + (context->reg[REG_H] << 8)] = (context->M = val);
+    const int addr = context->reg[REG_L] | (context->reg[REG_H] << 8);
+    set_mem_byte(context, addr, (context->M = val));
 }
 
 extern inline reg8_t get_reg_val(struct Context *context, int reg)
@@ -123,7 +101,9 @@ extern inline reg16_t get_rp_val(struct Context *context, int rp)
     case RP_SP:
         return context->SP;
     }
+    return 0; //will never happened but to prevent error: control reaches end of non-void function [-Werror=return-type] 
 }
+
 extern inline void set_rp_val(struct Context *context, int rp, reg16_t val)
 {
     switch (rp & 0x30)
@@ -132,15 +112,15 @@ extern inline void set_rp_val(struct Context *context, int rp, reg16_t val)
         context->reg[REG_C] = val & 0xff;
         context->reg[REG_B] = (val >> 8) & 0xff;
         break;
+    
     case RP_DE:
-
         context->reg[REG_E] = val & 0xff;
         context->reg[REG_D] = (val >> 8) & 0xff;
         break;
 
     case RP_HL:
-        context->reg[REG_H] = val & 0xff;
-        context->reg[REG_L] = (val >> 8) & 0xff;
+        context->reg[REG_L] = val & 0xff;
+        context->reg[REG_H] = (val >> 8) & 0xff;
         break;
 
     case RP_SP:
@@ -168,7 +148,7 @@ extern inline void set_reg_val(struct Context *context, int reg, reg8_t val)
 
 // AC is not update here will be implemented in the relevant instruction
 extern inline void update_flags(struct Context *context, int val, int inc_c)
-{  
+{
     if (inc_c)
     {
         context->flag[C_FLAG] = (val & 0xf00) > 0;
