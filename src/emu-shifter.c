@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stddef.h>
 #include "emu-shifter.h"
 
 static void emu_shifter_write_data(ShifterDevice *dev, int v_port, int value)

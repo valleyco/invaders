@@ -1,5 +1,5 @@
-#include "emu.h"
 #include "emu-device.h"
+#include "emu-ports.h"
 
 int port_read(Emulator *emu, int p)
 {
