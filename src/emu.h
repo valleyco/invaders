@@ -38,8 +38,8 @@ typedef struct
     int clock_ticks;
     unsigned char memory[65536];
     char port[8];
-    struct PortDevice *dev_read[256];
-    struct PortDevice *dev_write[256];
+    PortDevice *dev_read[256];
+    PortDevice *dev_write[256];
     struct EventQueue event_queue;
     int screen_int_count;
     int screen_int_half;

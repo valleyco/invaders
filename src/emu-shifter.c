@@ -24,18 +24,15 @@ static int (*port_read_array[])(ShifterDevice *g, int p) = {NULL, emu_shifter_re
 
 static void (*port_write_array[])(ShifterDevice *g, int p, int v) = {emu_shifter_write_shifts, NULL, emu_shifter_write_data};
 
-typedef int (*PORT_READ)(void *, int);
-typedef void (*PORT_WRITE)(void *, int, int);
-
 ShifterDevice *emu_shifter_init()
 {
-    ShifterDevice *dev = (ShifterDevice *)malloc(sizeof(ShifterDevice));
-    dev->portCount = 3;
-    dev->read = (PORT_READ *)port_read_array;
-    dev->write = (PORT_WRITE *)port_write_array;
-    dev->shift_amount = 0;
-    dev->shift_register = 0;
-    return dev;
+    ShifterDevice *device = (ShifterDevice *)malloc(sizeof(ShifterDevice));
+    device->portCount = 3;
+    device->read = (PORT_READ *)port_read_array;
+    device->write = (PORT_WRITE *)port_write_array;
+    device->shift_amount = 0;
+    device->shift_register = 0;
+    return device;
 }
 
 void emu_shifter_done(ShifterDevice *device)

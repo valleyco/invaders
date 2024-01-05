@@ -66,6 +66,51 @@ static void audio_callback(CallbackData *userdata, Uint8 *stream, int len);
 
 static SDL_AudioSpec dev_wav_spec;
 
+static void port_write(SoundDevice *g, int p, int v)
+{
+    g->portCount = g->portCount;
+    switch (p)
+    {
+    case 0:
+        if (v & 1)
+        {
+            callback_data[UFO_LOW_PITCH].audio_pos = 0;
+        }
+        if (v & 2)
+        {
+            callback_data[SHOOT].audio_pos = 0;
+        }
+        if (v & 8)
+        {
+            callback_data[INVADER_KILLED].audio_pos = 0;
+        }
+        break;
+    case 2:
+        if (v & 1)
+        {
+            callback_data[FAST_INVADER_1].audio_pos = 0;
+        }
+        if (v & 2)
+        {
+            callback_data[FAST_INVADER_2].audio_pos = 0;
+        }
+        if (v & 4)
+        {
+            callback_data[FAST_INVADER_3].audio_pos = 0;
+        }
+        if (v & 8)
+        {
+            callback_data[FAST_INVADER_4].audio_pos = 0;
+        }
+        break;
+    }
+}
+
+
+static int (*port_read_array[])(SoundDevice *g, int p) = {NULL, NULL, NULL};
+
+static void (*port_write_array[])(SoundDevice *g, int p, int v) = {port_write, NULL, port_write};
+
 SoundDevice *emu_sound_init()
 {
     if (!init_count++)
@@ -77,7 +122,7 @@ SoundDevice *emu_sound_init()
             dev_wav_spec.channels = 1;
             dev_wav_spec.freq = 11025;
             dev_wav_spec.silence = 128;
-            dev_wav_spec.samples = 4096;
+            dev_wav_spec.samples = 2048;
             dev_wav_spec.padding = 0;
             dev_wav_spec.size = 0;
             dev_wav_spec.format = 0x8010;
@@ -94,6 +139,10 @@ SoundDevice *emu_sound_init()
         }
     }
     SoundDevice *device = (SoundDevice *)malloc(sizeof(SoundDevice));
+    device->portCount = 3;
+    device->read = (PORT_READ *)port_read_array;
+    device->write = (PORT_WRITE *)port_write_array;
+    // device->read =
     return device;
 }
 

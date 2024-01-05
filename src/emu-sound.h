@@ -1,6 +1,6 @@
 #pragma once
 #include <stddef.h>
-
+#include "emu-device.h"
 typedef struct
 {
     int portCount;

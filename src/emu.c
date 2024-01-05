@@ -4,7 +4,8 @@
 #include "emu-ports.h"
 #include "emu-screen.h"
 #include "invaders.rom.h"
-static void emu_register_device(Emulator *emulator, struct PortDevice *device, int startPort);
+
+static void emu_register_device(Emulator *emulator, PortDevice *device, int startPort);
 
 Emulator *emu_new()
 {
@@ -22,11 +23,11 @@ Emulator *emu_new()
     emulator->context->rom_size = 0x2000;
 
     emulator->kbDevice = emu_keyboard_init();
-    emu_register_device(emulator, (struct PortDevice *)emulator->kbDevice, 0);
+    emu_register_device(emulator, (PortDevice *)emulator->kbDevice, 0);
     emulator->shiftDevice = emu_shifter_init();
-    emu_register_device(emulator, (struct PortDevice *)emulator->shiftDevice, 2);
+    emu_register_device(emulator, (PortDevice *)emulator->shiftDevice, 2);
     emulator->soundDevice = emu_sound_init();
-    emu_register_device(emulator, (struct PortDevice *)emulator->soundDevice, 3);
+    emu_register_device(emulator, (PortDevice *)emulator->soundDevice, 3);
     emulator->clock_ticks = 0;
     emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
     emulator->screen_int_half = 0;
@@ -35,7 +36,7 @@ Emulator *emu_new()
     return emulator;
 }
 
-static void emu_register_device(Emulator *emulator, struct PortDevice *device, int startPort)
+static void emu_register_device(Emulator *emulator, PortDevice *device, int startPort)
 {
     device->portOffset = startPort;
     for (int n = 0; n < device->portCount; n++)

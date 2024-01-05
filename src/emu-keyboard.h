@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <gtk/gtktypes.h>
+#include "emu-device.h"
 
 #define KEY_SHOT 1
 #define KEY_LEFT 2
@@ -32,8 +33,8 @@ typedef struct // this first field should match struct PortDevice
 {
     int portCount;
     int portOffset;
-    int (**read)(void *g, int p);
-    void (**write)(void *g, int p, int v);
+    PORT_READ *read;
+    PORT_WRITE *write;
     int key_status[KEY_MAX_ID + 1];
 } KeyboardDevice;
 
