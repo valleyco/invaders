@@ -18,8 +18,6 @@ static int emu_keyboard_read(KeyboardDevice *dev, int v_port)
     //     printf("in %d -> %d\n", v_port, result);
     return result;
 }
-typedef int (*PORT_READ)(void *, int);
-typedef void (*PORT_WRITE)(void *, int, int);
 
 static int (*port_read_array[])(KeyboardDevice *g, int p) = {emu_keyboard_read, emu_keyboard_read, emu_keyboard_read};
 

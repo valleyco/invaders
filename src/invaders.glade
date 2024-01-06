@@ -31,7 +31,6 @@
           <object class="GtkImage" id="ID_SCREEN_IMAGE">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="pixbuf">space-invaders.gif</property>
             <property name="icon_size">6</property>
           </object>
           <packing>

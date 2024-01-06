@@ -19,7 +19,7 @@ static GtkImage *screenImage;
 static gint64 emu_cycle_last_run;
 Emulator *emu;
 
-#define SCREEN_SCALE 3
+#define SCREEN_SCALE 2
 
 // called when window is closed
 /*

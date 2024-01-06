@@ -1,8 +1,9 @@
+#include "emu-device.h"
 #include "emu-ports.h"
 
 int port_read(Emulator *emu, int p)
 {
-    struct PortDevice *dev;
+    PortDevice *dev;
     if ((dev = emu->dev_read[p]))
     {
         const int v_port = p - dev->portOffset;
@@ -13,7 +14,7 @@ int port_read(Emulator *emu, int p)
 
 void port_write(Emulator *emu, int p, int v)
 {
-    struct PortDevice *dev;
+    PortDevice *dev;
     if ((dev = emu->dev_write[p]))
     {
         dev->write[p - dev->portOffset](dev, p - dev->portOffset, v);
