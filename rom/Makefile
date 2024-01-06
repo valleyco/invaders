@@ -1,5 +1,5 @@
 
-.PHONY: clean re
+.PHONY: clean re all
 
 all: invaders.rom.h
 
