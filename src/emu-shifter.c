@@ -27,8 +27,8 @@ ShifterDevice *emu_shifter_init()
 {
     ShifterDevice *device = (ShifterDevice *)malloc(sizeof(ShifterDevice));
     device->portCount = 3;
-    device->read = (PORT_READ *)port_read_array;
-    device->write = (PORT_WRITE *)port_write_array;
+    device->read = (PortRead *)port_read_array;
+    device->write = (PortWrite *)port_write_array;
     device->shift_amount = 0;
     device->shift_register = 0;
     return device;

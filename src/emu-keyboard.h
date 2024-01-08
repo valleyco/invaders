@@ -33,8 +33,8 @@ typedef struct // this first field should match struct PortDevice
 {
     int portCount;
     int portOffset;
-    PORT_READ *read;
-    PORT_WRITE *write;
+    PortRead *read;
+    PortWrite *write;
     int key_status[KEY_MAX_ID + 1];
 } KeyboardDevice;
 

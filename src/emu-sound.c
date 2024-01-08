@@ -172,8 +172,8 @@ SoundDevice *emu_sound_init()
     }
     SoundDevice *device = (SoundDevice *)malloc(sizeof(SoundDevice));
     device->portCount = 3;
-    device->read = (PORT_READ *)port_read_array;
-    device->write = (PORT_WRITE *)port_write_array;
+    device->read = (PortRead *)port_read_array;
+    device->write = (PortWrite *)port_write_array;
     // device->read =
     return device;
 }

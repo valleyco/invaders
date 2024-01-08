@@ -3,20 +3,17 @@
 
 int port_read(Emulator *emu, int p)
 {
-    PortDevice *dev;
-    if ((dev = emu->dev_read[p]))
+    if ((emu->dev_read_handler[p]))
     {
-        const int v_port = p - dev->portOffset;
-        return dev->read[v_port] ? dev->read[v_port](dev, v_port) : 0;
+        return emu->dev_read_handler[p](emu->dev_read[p]);
     }
     return 0;
 }
 
 void port_write(Emulator *emu, int p, int v)
 {
-    PortDevice *dev;
-    if ((dev = emu->dev_write[p]))
+    if (emu->dev_write_handler[p])
     {
-        dev->write[p - dev->portOffset](dev, p - dev->portOffset, v);
+        emu->dev_write_handler[p](emu->dev_read[p], v);
     }
 }

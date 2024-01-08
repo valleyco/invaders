@@ -27,8 +27,8 @@ KeyboardDevice *emu_keyboard_init()
 {
     KeyboardDevice *dev = malloc(sizeof(KeyboardDevice));
     dev->portCount = 3;
-    dev->read = (PORT_READ *)port_read_array;
-    dev->write = (PORT_WRITE *)port_write_array;
+    dev->read = (PortRead *)port_read_array;
+    dev->write = (PortWrite *)port_write_array;
     memset(dev->key_status, 0, sizeof(dev->key_status));
     dev->key_status[KEY_VIRTUAL_ON] = 1;
     return dev;

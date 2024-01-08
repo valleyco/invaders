@@ -32,20 +32,23 @@ struct EventQueue
     int event_head;
 };
 
+#define MAX_DEVICES 10
+
 typedef struct
 {
     struct Context *context;
     int clock_ticks;
     unsigned char memory[65536];
     char port[8];
+    int devices_count;
+    PortDevice *devices[MAX_DEVICES];
     PortDevice *dev_read[256];
+    PortRead dev_read_handler[256];
     PortDevice *dev_write[256];
+    PortWrite dev_write_handler[256];
     struct EventQueue event_queue;
     int screen_int_count;
     int screen_int_half;
-    KeyboardDevice *kbDevice;
-    ShifterDevice *shiftDevice;
-    SoundDevice *soundDevice;
 } Emulator;
 
 Emulator *emu_new();
