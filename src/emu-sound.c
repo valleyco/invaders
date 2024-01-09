@@ -21,7 +21,8 @@ typedef enum
     BIT_INVADER_KILLED = 8,
     BIT_UFO_HIGH_PITCH,
 } SoundBits_0;
-enum
+
+typedef enum
 {
     BIT_FAST_INVADER_1 = 1,
     BIT_FAST_INVADER_2 = 2,
@@ -85,65 +86,59 @@ static void audio_callback(CallbackData *userdata, Uint8 *stream, int len);
 
 static SDL_AudioSpec dev_wav_spec;
 
-static void port_write(SoundDevice *g, int p, int v)
+static void port_write_0(PortDevice *g, int v)
 {
-    g->portCount = g->portCount;
-    switch (p)
+    g=g;
+    callback_data[UFO_LOW_PITCH].is_playing = v & BIT_UFO_LOW_PITCH;
+    callback_data[SHOOT].is_playing = v & BIT_SHOOT;
+    callback_data[INVADER_KILLED].is_playing = v & BIT_INVADER_KILLED;
+
+    if (!callback_data[UFO_LOW_PITCH].is_playing)
     {
-    case 0:
-        callback_data[UFO_LOW_PITCH].is_playing = v & BIT_UFO_LOW_PITCH;
-        callback_data[SHOOT].is_playing = v & BIT_SHOOT;
-        callback_data[INVADER_KILLED].is_playing = v & BIT_INVADER_KILLED;
-
-        if (!callback_data[UFO_LOW_PITCH].is_playing)
-        {
-            callback_data[UFO_LOW_PITCH].audio_pos = 0;
-        }
-        if (!callback_data[SHOOT].is_playing)
-        {
-            callback_data[SHOOT].audio_pos = 0;
-        }
-        if (!callback_data[INVADER_KILLED].is_playing)
-        {
-            callback_data[INVADER_KILLED].audio_pos = 0;
-        }
-        break;
-    case 2:
-        callback_data[FAST_INVADER_1].is_playing = v & BIT_FAST_INVADER_1;
-        callback_data[FAST_INVADER_2].is_playing = v & BIT_FAST_INVADER_2;
-        callback_data[FAST_INVADER_3].is_playing = v & BIT_FAST_INVADER_3;
-        callback_data[FAST_INVADER_4].is_playing = v & BIT_FAST_INVADER_4; 
-        callback_data[EXPLOSION].is_playing = v & BIT_EXPLOSION;
-        if (!callback_data[FAST_INVADER_1].is_playing)
-        {
-            callback_data[FAST_INVADER_1].audio_pos = 0;
-        }
-        if (!callback_data[FAST_INVADER_2].is_playing)
-        {
-            callback_data[FAST_INVADER_2].audio_pos = 0;
-        }
-        if (!callback_data[FAST_INVADER_3].is_playing)
-        {
-            callback_data[FAST_INVADER_3].audio_pos = 0;
-        }
-        if (!callback_data[FAST_INVADER_4].is_playing)
-        {
-            callback_data[FAST_INVADER_4].audio_pos = 0;
-        }
-        if (!callback_data[EXPLOSION].is_playing)
-        {
-            callback_data[EXPLOSION].audio_pos = 0;
-        }
-
-        break;
+        callback_data[UFO_LOW_PITCH].audio_pos = 0;
+    }
+    if (!callback_data[SHOOT].is_playing)
+    {
+        callback_data[SHOOT].audio_pos = 0;
+    }
+    if (!callback_data[INVADER_KILLED].is_playing)
+    {
+        callback_data[INVADER_KILLED].audio_pos = 0;
+    }
+}
+static void port_write_1(PortDevice *g, int v)
+{
+    g=g;
+    callback_data[FAST_INVADER_1].is_playing = v & BIT_FAST_INVADER_1;
+    callback_data[FAST_INVADER_2].is_playing = v & BIT_FAST_INVADER_2;
+    callback_data[FAST_INVADER_3].is_playing = v & BIT_FAST_INVADER_3;
+    callback_data[FAST_INVADER_4].is_playing = v & BIT_FAST_INVADER_4;
+    callback_data[EXPLOSION].is_playing = v & BIT_EXPLOSION;
+    if (!callback_data[FAST_INVADER_1].is_playing)
+    {
+        callback_data[FAST_INVADER_1].audio_pos = 0;
+    }
+    if (!callback_data[FAST_INVADER_2].is_playing)
+    {
+        callback_data[FAST_INVADER_2].audio_pos = 0;
+    }
+    if (!callback_data[FAST_INVADER_3].is_playing)
+    {
+        callback_data[FAST_INVADER_3].audio_pos = 0;
+    }
+    if (!callback_data[FAST_INVADER_4].is_playing)
+    {
+        callback_data[FAST_INVADER_4].audio_pos = 0;
+    }
+    if (!callback_data[EXPLOSION].is_playing)
+    {
+        callback_data[EXPLOSION].audio_pos = 0;
     }
 }
 
-static int (*port_read_array[])(SoundDevice *g, int p) = {NULL, NULL, NULL};
+static void (*port_write_array[])(PortDevice *g, int v) = {port_write_0, port_write_1};
 
-static void (*port_write_array[])(SoundDevice *g, int p, int v) = {port_write, NULL, port_write};
-
-SoundDevice *emu_sound_init()
+PortDevice *emu_sound_init()
 {
     if (!init_count++)
     {
@@ -170,15 +165,16 @@ SoundDevice *emu_sound_init()
             /* Start playing */
         }
     }
-    SoundDevice *device = (SoundDevice *)malloc(sizeof(SoundDevice));
-    device->portCount = 3;
-    device->read = (PortRead *)port_read_array;
+    PortDevice *device = (PortDevice *)malloc(sizeof(PortDevice));
+    device->dispose = emu_sound_done;
+    device->readPortCount = 0;
+    device->writePortCount = 2;
     device->write = (PortWrite *)port_write_array;
     // device->read =
     return device;
 }
 
-void emu_sound_done(SoundDevice *dev)
+void emu_sound_done(PortDevice *device)
 {
     if (!--init_count)
     {
@@ -189,7 +185,7 @@ void emu_sound_done(SoundDevice *dev)
         }
         SDL_Quit();
     }
-    free(dev);
+    free(device);
 }
 
 static void audio_callback(CallbackData *userdata, Uint8 *stream, int len)

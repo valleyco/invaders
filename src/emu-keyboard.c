@@ -6,37 +6,56 @@ static int port_bit_map[3][8] = {
     {KEY_DIP_3, KEY_DIP_5, KEY_TILT, KEY_DIP_6, KEY_P2_SHOT, KEY_P2_LEFT, KEY_P2_RIGHT, KEY_DIP_6},
 };
 
-static int emu_keyboard_read(KeyboardDevice *dev, int v_port)
+static inline int emu_keyboard_read(PortDevice *device, int v_port)
 {
     int result = 0;
     for (int i = 7; i >= 0; i--)
     {
         result <<= 1;
-        result |= dev->key_status[port_bit_map[v_port][i]];
+        result |= ((int *)device->data)[port_bit_map[v_port][i]];
     }
     // if (result && result != 8)
     //     printf("in %d -> %d\n", v_port, result);
     return result;
 }
 
-static int (*port_read_array[])(KeyboardDevice *g, int p) = {emu_keyboard_read, emu_keyboard_read, emu_keyboard_read};
-
-static void (*port_write_array[])(KeyboardDevice *g, int p, int v) = {NULL, NULL, NULL};
-
-KeyboardDevice *emu_keyboard_init()
+static int emu_keyboard_read_port_0(PortDevice *device)
 {
-    KeyboardDevice *dev = malloc(sizeof(KeyboardDevice));
-    dev->portCount = 3;
-    dev->read = (PortRead *)port_read_array;
-    dev->write = (PortWrite *)port_write_array;
-    memset(dev->key_status, 0, sizeof(dev->key_status));
-    dev->key_status[KEY_VIRTUAL_ON] = 1;
-    return dev;
+    return emu_keyboard_read(device, 0);
 }
 
-void emu_keyboard_done(KeyboardDevice *dev)
+static int emu_keyboard_read_port_1(PortDevice *device)
 {
-    free(dev);
+    return emu_keyboard_read(device, 1);
+}
+
+static int emu_keyboard_read_port_2(PortDevice *device)
+{
+    return emu_keyboard_read(device, 2);
+}
+
+static int (*port_read_array[])(PortDevice *g) = {emu_keyboard_read_port_0, emu_keyboard_read_port_1, emu_keyboard_read_port_2};
+
+PortDevice *emu_keyboard_init(KeyEvent *keyEventHandler)
+{
+    PortDevice *device = malloc(sizeof(PortDevice));
+    device->dispose = emu_keyboard_done;
+    device->readPortCount = 3;
+    device->read = (PortRead *)port_read_array;
+    device->writePortCount = 0;
+    device->write = NULL;
+    int *key_status = malloc(sizeof(int) * KEY_MAX_ID + 1);
+    memset(key_status, 0, sizeof(int) * KEY_MAX_ID + 1);
+    key_status[KEY_VIRTUAL_ON] = 1;
+    device->data = key_status;
+    *keyEventHandler = handle_keyboard_event;
+    return device;
+}
+
+void emu_keyboard_done(PortDevice *device)
+{
+    free(device->data);
+    free(device);
 }
 
 static int get_key_action(int keyVal)
@@ -82,9 +101,9 @@ static int get_key_action(int keyVal)
     }
 }
 
-int handle_keyboard_event(KeyboardDevice *device, int keyVal, int pressed)
+int handle_keyboard_event(PortDevice *device, int keyVal, int pressed)
 {
     int key = get_key_action(keyVal);
-    device->key_status[key] = pressed ? 1 : 0;
+    ((int *)device->data)[key] = pressed ? 1 : 0;
     return key > 0;
 }

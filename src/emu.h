@@ -49,6 +49,9 @@ typedef struct
     struct EventQueue event_queue;
     int screen_int_count;
     int screen_int_half;
+    KeyEvent key_event_handler;
+    PortDevice *key_event_device;
+
 } Emulator;
 
 Emulator *emu_new();

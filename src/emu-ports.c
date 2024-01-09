@@ -14,6 +14,6 @@ void port_write(Emulator *emu, int p, int v)
 {
     if (emu->dev_write_handler[p])
     {
-        emu->dev_write_handler[p](emu->dev_read[p], v);
+        emu->dev_write_handler[p](emu->dev_write[p], v);
     }
 }

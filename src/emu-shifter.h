@@ -4,10 +4,6 @@
 
 typedef struct
 {
-    int portCount;
-    int portOffset;
-    int (**read)(void *g, int p);
-    void (**write)(void *g, int p, int v);
     int shift_register;
     int shift_amount;
 } ShifterDevice;
@@ -19,5 +15,5 @@ typedef struct
 // mapped to port 4 on SI
 #define SHIFTER_DATE_WRITE 2
 
-ShifterDevice *emu_shifter_init();
-void emu_shifter_done(ShifterDevice *device);
+PortDevice *emu_shifter_init();
+void emu_shifter_done(PortDevice *device);

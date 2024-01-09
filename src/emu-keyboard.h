@@ -31,13 +31,9 @@
 
 typedef struct // this first field should match struct PortDevice
 {
-    int portCount;
-    int portOffset;
-    PortRead *read;
-    PortWrite *write;
     int key_status[KEY_MAX_ID + 1];
-} KeyboardDevice;
+} KeyboardDeviceData;
 
-int handle_keyboard_event(KeyboardDevice *device, int keyVal, int pressed);
-KeyboardDevice *emu_keyboard_init();
-void emu_keyboard_done(KeyboardDevice *dev);
+int handle_keyboard_event(PortDevice *device, int keyVal, int pressed);
+PortDevice *emu_keyboard_init(KeyEvent *keyEventHandler);
+void emu_keyboard_done(PortDevice *dev);

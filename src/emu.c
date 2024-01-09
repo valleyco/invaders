@@ -6,19 +6,16 @@
 #include "invaders.rom.h"
 
 static void emu_register_device(Emulator *emulator, PortDevice *device, const int *readPortMap, const int *writePortMap);
-static const int emu_keyboard_read_map = {0, 1, 2};
-static const int emu_shifter_read_map = {3};
-static const int emu_shifter_write_map = {2, 4};
-static const int emu_sound_write_map = {3, 5};
-
-static KeyEvent key_event_handler = NULL;
-static PortDevice *key_event_device = NULL;
+static const int emu_keyboard_read_map[] = {0, 1, 2};
+static const int emu_shifter_read_map[] = {3};
+static const int emu_shifter_write_map[] = {2, 4};
+static const int emu_sound_write_map[] = {3, 5};
 
 Emulator *emu_new()
 {
     Emulator *emulator = (Emulator *)malloc(sizeof(Emulator));
+    memset(emulator, 0, sizeof(*emulator));
     emulator->context = (struct Context *)malloc(sizeof(struct Context));
-    memset(emulator, sizeof(*emulator), 0);
     emulator->context->gData = (void *)emulator;
     emulator->context->memory = emulator->memory;
     emulator->context->port_read = (int (*)(void *, int))port_read;
@@ -28,7 +25,9 @@ Emulator *emu_new()
     emulator->context->address_mask = 0x3FFF;
     emulator->context->rom_size = 0x2000;
 
-    emu_register_device(emulator, emu_keyboard_init(), emu_keyboard_read_map, NULL);
+    PortDevice* device =emu_keyboard_init(&emulator->key_event_handler);
+    emulator->key_event_device = device;
+    emu_register_device(emulator, device, emu_keyboard_read_map, NULL);
     emu_register_device(emulator, emu_shifter_init(), emu_shifter_read_map, emu_shifter_write_map);
     emu_register_device(emulator, emu_sound_init(), NULL, emu_sound_write_map);
     emulator->clock_ticks = 0;
@@ -65,7 +64,7 @@ static void emu_register_device(Emulator *emulator, PortDevice *device, const in
                 exit(1);
             }
             emulator->dev_write[writePortMap[n]] = device;
-            emulator->dev_write_handler[readPortMap[n]] = device->write[n];
+            emulator->dev_write_handler[writePortMap[n]] = device->write[n];
         }
     }
 }
@@ -74,7 +73,7 @@ void emu_free(Emulator *emulator)
 {
     while (emulator->devices_count--)
     {
-        emulator->devices[emulator->devices_count]->dispose(emulator->devices[emulator->devices_count]);
+        (emulator->devices[emulator->devices_count])->dispose(emulator->devices[emulator->devices_count]);
     }
     free(emulator->context);
     free(emulator);
@@ -126,5 +125,5 @@ int emu_execute(Emulator *emulator, int clocks_ticks)
 
 int emu_handle_keyboard(Emulator *emulator, int keyVal, int isPressed)
 {
-    return key_event_handler ? key_event_handler(key_event_device, keyVal, isPressed) : 0;
+    return emulator->key_event_handler ? emulator->key_event_handler(emulator->key_event_device, keyVal, isPressed) : 0;
 }
