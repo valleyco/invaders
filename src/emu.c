@@ -119,7 +119,7 @@ int emu_execute(Emulator *emulator, int clocks_ticks)
             emulator->screen_int_count += CYCLES_PER_SCREEN_INTERRUPT;
         }
     }
-    emulator->clock_ticks += ticks;
+    //emulator->clock_ticks += ticks;
     return ticks;
 }
 
