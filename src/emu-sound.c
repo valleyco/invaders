@@ -88,7 +88,7 @@ static SDL_AudioSpec dev_wav_spec;
 
 static void port_write_0(PortDevice *g, int v)
 {
-    g=g;
+    g->data = NULL;
     callback_data[UFO_LOW_PITCH].is_playing = v & BIT_UFO_LOW_PITCH;
     callback_data[SHOOT].is_playing = v & BIT_SHOOT;
     callback_data[INVADER_KILLED].is_playing = v & BIT_INVADER_KILLED;
@@ -108,7 +108,7 @@ static void port_write_0(PortDevice *g, int v)
 }
 static void port_write_1(PortDevice *g, int v)
 {
-    g=g;
+    g->data = NULL;
     callback_data[FAST_INVADER_1].is_playing = v & BIT_FAST_INVADER_1;
     callback_data[FAST_INVADER_2].is_playing = v & BIT_FAST_INVADER_2;
     callback_data[FAST_INVADER_3].is_playing = v & BIT_FAST_INVADER_3;
