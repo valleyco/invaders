@@ -8,7 +8,7 @@
 
 // 100 ms
 #define CPU_8080_HZ 2000000
-#define TICK_INTERVAL 100
+#define TICK_INTERVAL 1000
 #define CPU_8080_CLOCKS_PER_TICK (CPU_8080_HZ / TICK_INTERVAL)
 #define CYCLES_PER_SCREEN_INTERRUPT ((int)(CPU_8080_HZ / 120))
 
@@ -42,6 +42,8 @@ typedef struct
     char port[8];
     int devices_count;
     PortDevice *devices[MAX_DEVICES];
+    int dev_ticks_count;
+    PortDevice *dev_ticks[MAX_DEVICES];
     PortDevice *dev_read[256];
     PortRead dev_read_handler[256];
     PortDevice *dev_write[256];

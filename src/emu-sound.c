@@ -166,6 +166,7 @@ PortDevice *emu_sound_init()
         }
     }
     PortDevice *device = (PortDevice *)malloc(sizeof(PortDevice));
+    memset(device, 0, sizeof(PortDevice));
     device->dispose = emu_sound_done;
     device->readPortCount = 0;
     device->writePortCount = 2;
