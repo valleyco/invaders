@@ -3,6 +3,27 @@
 #include "emu.h"
 #include "emu-screen.h"
 
+static void screen_tick(PortDevice *device)
+{
+    ((ScreenDevice *)device->data)->ticks = (((ScreenDevice *)device->data)->ticks + 1) % 17;
+}
+
+void emu_screen_done(PortDevice *device)
+{
+    free(device->data);
+    free(device);
+}
+
+PortDevice *emu_screen_init()
+{
+    PortDevice *device = malloc(sizeof(PortDevice));
+    memset(device, 0, sizeof(PortDevice));
+    device->data = malloc(sizeof(ScreenDevice));
+    device->dispose = emu_screen_done;
+    device->clock_ticks = screen_tick;
+    return device;
+}
+
 static void color_rect(const GdkPixbuf *pixbuf, int x, int y, int w, int h, uint32_t color)
 {
     const int pixbuf_n_channels = gdk_pixbuf_get_n_channels(pixbuf);

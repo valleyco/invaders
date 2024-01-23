@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "emu-shifter.h"
 
 static void emu_shifter_write_data(PortDevice *device, int value)
@@ -26,6 +27,7 @@ static void (*port_write_array[])(PortDevice *g, int v) = {emu_shifter_write_shi
 PortDevice *emu_shifter_init()
 {
     PortDevice *device = malloc(sizeof(PortDevice));
+    memset(device, 0, sizeof(PortDevice));
     ShifterDevice *shift = (ShifterDevice *)malloc(sizeof(ShifterDevice));
     device->data = shift;
 

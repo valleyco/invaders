@@ -9,7 +9,7 @@ extern "C"
   typedef int (*PortRead)(PortDevice *);
   typedef void (*PortWrite)(PortDevice *, int value);
   typedef void (*IntReq)(int num);
-  typedef void (*ClockTicks)(PortDevice *, int ticks);
+  typedef void (*ClockTicks)(PortDevice *);
   typedef void (*Dispose)(PortDevice *);
 
   typedef struct tagPortDevice
@@ -19,7 +19,7 @@ extern "C"
     int writePortCount;
     PortWrite *write;
     void *data;
-    ClockTicks *clock_ticks;
+    ClockTicks clock_ticks;
     Dispose dispose;
   } PortDevice;
 

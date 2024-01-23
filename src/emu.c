@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include "emu.h"
@@ -25,8 +26,9 @@ Emulator *emu_new()
     emulator->context->address_mask = 0x3FFF;
     emulator->context->rom_size = 0x2000;
 
-    PortDevice* device =emu_keyboard_init(&emulator->key_event_handler);
+    PortDevice *device = emu_keyboard_init(&emulator->key_event_handler);
     emulator->key_event_device = device;
+    emu_register_device(emulator, emu_screen_init(), NULL, NULL);
     emu_register_device(emulator, device, emu_keyboard_read_map, NULL);
     emu_register_device(emulator, emu_shifter_init(), emu_shifter_read_map, emu_shifter_write_map);
     emu_register_device(emulator, emu_sound_init(), NULL, emu_sound_write_map);
@@ -67,6 +69,10 @@ static void emu_register_device(Emulator *emulator, PortDevice *device, const in
             emulator->dev_write_handler[writePortMap[n]] = device->write[n];
         }
     }
+    if (device->clock_ticks)
+    {
+        emulator->dev_ticks[emulator->dev_ticks_count++] = device;
+    }
 }
 
 void emu_free(Emulator *emulator)
@@ -100,6 +106,16 @@ static void emu_handle_events(Emulator *emulator)
     emu_event_drop(emulator);
 }
 
+static inline bool handleTicks(Emulator *emulator, int cycles)
+{
+    emulator->clock_ticks += cycles;
+    if (emulator->clock_ticks >= CPU_8080_CLOCKS_PER_TICK)
+    {
+        emulator->clock_ticks -= CPU_8080_CLOCKS_PER_TICK;
+        return true;
+    }
+    return false;
+}
 int emu_execute(Emulator *emulator, int clocks_ticks)
 {
     if (emulator->event_queue.event_count)
@@ -110,6 +126,13 @@ int emu_execute(Emulator *emulator, int clocks_ticks)
     while (ticks < clocks_ticks)
     {
         int cycles = emu_8080_execute(emulator->context);
+        if (handleTicks(emulator, cycles))
+        {
+            for (PortDevice **pd = emulator->dev_ticks; *pd; pd++)
+            {
+                (*pd)->clock_ticks(*pd);
+            }
+        }
         emulator->screen_int_count -= cycles;
         ticks += cycles;
         if (emulator->screen_int_count < 0 && emulator->context->interrupt)
@@ -119,7 +142,6 @@ int emu_execute(Emulator *emulator, int clocks_ticks)
             emulator->screen_int_count += CYCLES_PER_SCREEN_INTERRUPT;
         }
     }
-    //emulator->clock_ticks += ticks;
     return ticks;
 }
 

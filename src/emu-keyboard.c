@@ -39,6 +39,7 @@ static int (*port_read_array[])(PortDevice *g) = {emu_keyboard_read_port_0, emu_
 PortDevice *emu_keyboard_init(KeyEvent *keyEventHandler)
 {
     PortDevice *device = malloc(sizeof(PortDevice));
+    memset(device, 0, sizeof(PortDevice));
     device->dispose = emu_keyboard_done;
     device->readPortCount = 3;
     device->read = (PortRead *)port_read_array;
