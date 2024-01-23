@@ -28,8 +28,8 @@ Emulator *emu_new()
 
     PortDevice *device = emu_keyboard_init(&emulator->key_event_handler);
     emulator->key_event_device = device;
-    emu_register_device(emulator, emu_screen_init(), NULL, NULL);
     emu_register_device(emulator, device, emu_keyboard_read_map, NULL);
+    emu_register_device(emulator, emu_screen_init(), NULL, NULL);
     emu_register_device(emulator, emu_shifter_init(), emu_shifter_read_map, emu_shifter_write_map);
     emu_register_device(emulator, emu_sound_init(), NULL, emu_sound_write_map);
     emulator->clock_ticks = 0;
