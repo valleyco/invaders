@@ -5,7 +5,17 @@
 
 static void screen_tick(PortDevice *device)
 {
-    ((ScreenDevice *)device->data)->ticks = (((ScreenDevice *)device->data)->ticks + 1) % 17;
+    ScreenDevice *screenDevice = (ScreenDevice *)device->data;
+    screenDevice->ticks = (screenDevice->ticks + 1) % 1000;
+    int pos = screenDevice->ticks % 17;
+    if (pos == 0)
+    {
+        *(screenDevice->intr) |= (1 << 1);
+    }
+    else if (pos == 8)
+    {
+        *(screenDevice->intr) |= (1 << 2);
+    }
 }
 
 void emu_screen_done(PortDevice *device)
@@ -14,13 +24,16 @@ void emu_screen_done(PortDevice *device)
     free(device);
 }
 
-PortDevice *emu_screen_init()
+PortDevice *emu_screen_init(int *intr)
 {
     PortDevice *device = malloc(sizeof(PortDevice));
     memset(device, 0, sizeof(PortDevice));
-    device->data = malloc(sizeof(ScreenDevice));
+    ScreenDevice *screenDevice = malloc(sizeof(ScreenDevice));
+    device->data = screenDevice;
     device->dispose = emu_screen_done;
     device->clock_ticks = screen_tick;
+    screenDevice->intr = intr;
+    screenDevice->ticks = 0;
     return device;
 }
 

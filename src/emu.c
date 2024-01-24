@@ -26,16 +26,12 @@ Emulator *emu_new()
     emulator->context->address_mask = 0x3FFF;
     emulator->context->rom_size = 0x2000;
 
-    PortDevice *device = emu_keyboard_init(&emulator->key_event_handler);
-    emulator->key_event_device = device;
-    emu_register_device(emulator, device, emu_keyboard_read_map, NULL);
-    emu_register_device(emulator, emu_screen_init(), NULL, NULL);
+    emulator->key_event_device = emu_keyboard_init(&emulator->key_event_handler);
+    emu_register_device(emulator, emulator->key_event_device, emu_keyboard_read_map, NULL);
+    emu_register_device(emulator, emu_screen_init(&emulator->intr), NULL, NULL);
     emu_register_device(emulator, emu_shifter_init(), emu_shifter_read_map, emu_shifter_write_map);
     emu_register_device(emulator, emu_sound_init(), NULL, emu_sound_write_map);
     emulator->clock_ticks = 0;
-    emulator->screen_int_count = CYCLES_PER_SCREEN_INTERRUPT;
-    emulator->screen_int_half = 0;
-    emulator->event_queue.event_head = emulator->event_queue.event_tail = emulator->event_queue.event_count = 0;
     memcpy(emulator->memory, invaders_rom, invaders_rom_len);
     return emulator;
 }
@@ -85,27 +81,6 @@ void emu_free(Emulator *emulator)
     free(emulator);
 }
 
-void emu_event_add(Emulator *emulator, struct Event event)
-{
-    if (emulator->event_queue.event_count == EVENT_QUEUE_LENGTH)
-    {
-        return;
-    }
-    emulator->event_queue.event_count++;
-    emulator->event_queue.event[(emulator->event_queue.event_head++) % 0x0F] = event;
-}
-
-static void emu_event_drop(Emulator *emulator)
-{
-    emulator->event_queue.event_count--;
-    emulator->event_queue.event_tail = (emulator->event_queue.event_tail + 1) % 0x0F;
-}
-
-static void emu_handle_events(Emulator *emulator)
-{
-    emu_event_drop(emulator);
-}
-
 static inline bool handleTicks(Emulator *emulator, int cycles)
 {
     emulator->clock_ticks += cycles;
@@ -116,16 +91,30 @@ static inline bool handleTicks(Emulator *emulator, int cycles)
     }
     return false;
 }
+
+static inline bool handleIntr(Emulator *emulator)
+{
+    int mask = 1;
+    int intr = 0;
+    while (intr < 8)
+    {
+        if (emulator->intr & mask)
+        {
+            emulator->intr = emulator->intr & ~mask;
+            return emu_8080_rst(emulator->context, intr);
+        }
+        mask <<= 1;
+        intr++;
+    }
+    return 0;
+}
 int emu_execute(Emulator *emulator, int clocks_ticks)
 {
-    if (emulator->event_queue.event_count)
-    {
-        emu_handle_events(emulator);
-    }
     int ticks = 0;
     while (ticks < clocks_ticks)
     {
-        int cycles = emu_8080_execute(emulator->context);
+        int intrCycle = handleIntr(emulator);
+        int cycles = intrCycle ? intrCycle : emu_8080_execute(emulator->context);
         if (handleTicks(emulator, cycles))
         {
             for (PortDevice **pd = emulator->dev_ticks; *pd; pd++)
@@ -133,14 +122,7 @@ int emu_execute(Emulator *emulator, int clocks_ticks)
                 (*pd)->clock_ticks(*pd);
             }
         }
-        emulator->screen_int_count -= cycles;
         ticks += cycles;
-        if (emulator->screen_int_count < 0 && emulator->context->interrupt)
-        {
-            ticks += emu_8080_rst(emulator->context, emulator->screen_int_half ? 1 : 2);
-            emulator->screen_int_half = 1 - emulator->screen_int_half;
-            emulator->screen_int_count += CYCLES_PER_SCREEN_INTERRUPT;
-        }
     }
     return ticks;
 }

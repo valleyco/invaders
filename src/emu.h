@@ -1,5 +1,6 @@
 #pragma once
 #include <stdlib.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include "emu-8080.h"
 #include "emu-shifter.h"
@@ -12,26 +13,6 @@
 #define CPU_8080_CLOCKS_PER_TICK (CPU_8080_HZ / TICK_INTERVAL)
 #define CYCLES_PER_SCREEN_INTERRUPT ((int)(CPU_8080_HZ / 120))
 
-enum event_types
-{
-    EVENT_KB
-};
-
-struct Event
-{
-    enum event_types type;
-    int data;
-};
-
-#define EVENT_QUEUE_LENGTH 16
-struct EventQueue
-{
-    struct Event event[EVENT_QUEUE_LENGTH];
-    int event_count;
-    int event_tail;
-    int event_head;
-};
-
 #define MAX_DEVICES 10
 
 typedef struct
@@ -39,25 +20,21 @@ typedef struct
     struct Context *context;
     int clock_ticks;
     unsigned char memory[65536];
-    char port[8];
     int devices_count;
+    int intr;
     PortDevice *devices[MAX_DEVICES];
-    int dev_ticks_count;
     PortDevice *dev_ticks[MAX_DEVICES];
     PortDevice *dev_read[256];
     PortRead dev_read_handler[256];
     PortDevice *dev_write[256];
     PortWrite dev_write_handler[256];
-    struct EventQueue event_queue;
-    int screen_int_count;
-    int screen_int_half;
     KeyEvent key_event_handler;
     PortDevice *key_event_device;
+    int dev_ticks_count;
 
 } Emulator;
 
 Emulator *emu_new();
 void emu_free(Emulator *emulator);
-void emu_event_add(Emulator *emulator, struct Event event);
 int emu_execute(Emulator *emulator, int clocks_ticks);
 int emu_handle_keyboard(Emulator *emulator, int keyVal, int isPressed);
