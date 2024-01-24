@@ -14,8 +14,6 @@ static inline int emu_keyboard_read(PortDevice *device, int v_port)
         result <<= 1;
         result |= ((int *)device->data)[port_bit_map[v_port][i]];
     }
-    // if (result && result != 8)
-    //     printf("in %d -> %d\n", v_port, result);
     return result;
 }
 
@@ -45,8 +43,8 @@ PortDevice *emu_keyboard_init(KeyEvent *keyEventHandler)
     device->read = (PortRead *)port_read_array;
     device->writePortCount = 0;
     device->write = NULL;
-    int *key_status = malloc(sizeof(int) * KEY_MAX_ID + 1);
-    memset(key_status, 0, sizeof(int) * KEY_MAX_ID + 1);
+    int *key_status = malloc(sizeof(int) * (KEY_MAX_ID + 1));
+    memset(key_status, 0, sizeof(int) * (KEY_MAX_ID + 1));
     key_status[KEY_VIRTUAL_ON] = 1;
     device->data = key_status;
     *keyEventHandler = handle_keyboard_event;
