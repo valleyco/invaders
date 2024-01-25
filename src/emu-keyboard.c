@@ -1,15 +1,15 @@
 #include "emu-keyboard.h"
 
 static int port_bit_map[3][8] = {
-    {KEY_DIP_4, KEY_VIRTUAL_ON, KEY_VIRTUAL_ON, KEY_VIRTUAL_ON, KEY_SHOT, KEY_LEFT, KEY_RIGHT, KEY_VIRTUAL_OFF},
-    {KEY_CREDIT, KEY_P2_START, KEY_P1_START, KEY_VIRTUAL_ON, KEY_P1_SHOT, KEY_P1_LEFT, KEY_P1_RIGHT, KEY_VIRTUAL_OFF},
-    {KEY_DIP_3, KEY_DIP_5, KEY_TILT, KEY_DIP_6, KEY_P2_SHOT, KEY_P2_LEFT, KEY_P2_RIGHT, KEY_DIP_6},
+    {KEY_VIRTUAL_OFF, KEY_RIGHT, KEY_LEFT, KEY_SHOT, KEY_VIRTUAL_ON, KEY_VIRTUAL_ON, KEY_VIRTUAL_ON, KEY_DIP_4},
+    {KEY_VIRTUAL_OFF, KEY_P1_RIGHT, KEY_P1_LEFT, KEY_P1_SHOT, KEY_VIRTUAL_ON, KEY_P1_START, KEY_P2_START, KEY_CREDIT},
+    {KEY_DIP_6, KEY_P2_RIGHT, KEY_P2_LEFT, KEY_P2_SHOT, KEY_DIP_6, KEY_DIP_5, KEY_DIP_3},
 };
 
 static inline int emu_keyboard_read(PortDevice *device, int v_port)
 {
     int result = 0;
-    for (int i = 7; i >= 0; i--)
+    for (int i = 0; i < 8; i++)
     {
         result <<= 1;
         result |= ((int *)device->data)[port_bit_map[v_port][i]];
