@@ -96,6 +96,10 @@ static inline bool handleIntr(Emulator *emulator)
 {
     int mask = 1;
     int intr = 0;
+    if (!emulator->intr)
+    {
+        return 0;
+    }
     while (intr < 8)
     {
         if (emulator->intr & mask)
@@ -108,6 +112,7 @@ static inline bool handleIntr(Emulator *emulator)
     }
     return 0;
 }
+
 int emu_execute(Emulator *emulator, int clocks_ticks)
 {
     int ticks = 0;

@@ -1,9 +1,10 @@
 #include "emu-keyboard.h"
 
 static int port_bit_map[3][8] = {
+    // MSB -> LSB
     {KEY_VIRTUAL_OFF, KEY_RIGHT, KEY_LEFT, KEY_SHOT, KEY_VIRTUAL_ON, KEY_VIRTUAL_ON, KEY_VIRTUAL_ON, KEY_DIP_4},
     {KEY_VIRTUAL_OFF, KEY_P1_RIGHT, KEY_P1_LEFT, KEY_P1_SHOT, KEY_VIRTUAL_ON, KEY_P1_START, KEY_P2_START, KEY_CREDIT},
-    {KEY_DIP_6, KEY_P2_RIGHT, KEY_P2_LEFT, KEY_P2_SHOT, KEY_DIP_6, KEY_DIP_5, KEY_DIP_3},
+    {KEY_DIP_7, KEY_P2_RIGHT, KEY_P2_LEFT, KEY_P2_SHOT, KEY_DIP_6, KEY_TILT, KEY_DIP_5, KEY_DIP_3},
 };
 
 static inline int emu_keyboard_read(PortDevice *device, int v_port)

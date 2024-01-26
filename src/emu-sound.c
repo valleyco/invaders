@@ -12,6 +12,7 @@ typedef enum
     FAST_INVADER_4,
     UFO_HIGH_PITCH,
     UFO_LOW_PITCH,
+    SOUND_MAX,
 } Sounds;
 
 typedef enum
@@ -30,6 +31,13 @@ typedef enum
     BIT_FAST_INVADER_4 = 8,
     BIT_EXPLOSION = 16
 } SoundBits_2;
+
+typedef struct
+{
+    int ports[2];
+    int started[SOUND_MAX];
+    int end[SOUND_MAX];
+} SoundDevice;
 
 static const char *wave_file_name[] = {
     "../wav/shoot.wav",
@@ -86,9 +94,9 @@ static void audio_callback(CallbackData *userdata, Uint8 *stream, int len);
 
 static SDL_AudioSpec dev_wav_spec;
 
-static void port_write_0(PortDevice *g, int v)
+static void port_write_0(PortDevice *device, int v)
 {
-    g->data = NULL;
+    ((SoundDevice *)device->data)->ports[0] = v;
     callback_data[UFO_LOW_PITCH].is_playing = v & BIT_UFO_LOW_PITCH;
     callback_data[SHOOT].is_playing = v & BIT_SHOOT;
     callback_data[INVADER_KILLED].is_playing = v & BIT_INVADER_KILLED;
@@ -106,9 +114,10 @@ static void port_write_0(PortDevice *g, int v)
         callback_data[INVADER_KILLED].audio_pos = 0;
     }
 }
-static void port_write_1(PortDevice *g, int v)
+
+static void port_write_1(PortDevice *device, int v)
 {
-    g->data = NULL;
+    ((SoundDevice *)device->data)->ports[1] = v;
     callback_data[FAST_INVADER_1].is_playing = v & BIT_FAST_INVADER_1;
     callback_data[FAST_INVADER_2].is_playing = v & BIT_FAST_INVADER_2;
     callback_data[FAST_INVADER_3].is_playing = v & BIT_FAST_INVADER_3;
@@ -134,6 +143,11 @@ static void port_write_1(PortDevice *g, int v)
     {
         callback_data[EXPLOSION].audio_pos = 0;
     }
+}
+
+static void sound_tick(PortDevice *device)
+{
+    ((SoundDevice *)device->data)->started[0] = 0;
 }
 
 static void (*port_write_array[])(PortDevice *g, int v) = {port_write_0, port_write_1};
@@ -171,7 +185,9 @@ PortDevice *emu_sound_init()
     device->readPortCount = 0;
     device->writePortCount = 2;
     device->write = (PortWrite *)port_write_array;
-    // device->read =
+    device->clock_ticks = sound_tick;
+    device->data = malloc(sizeof(SoundDevice));
+    memset(device->data, 0, sizeof(SoundDevice));
     return device;
 }
 
@@ -186,12 +202,12 @@ void emu_sound_done(PortDevice *device)
         }
         SDL_Quit();
     }
+    free(device->data);
     free(device);
 }
 
 static void audio_callback(CallbackData *userdata, Uint8 *stream, int len)
 {
-    // printf("---------\n");
     SDL_memset(stream, 0, len);
     for (int i = 0; i < SOUND_COUNT; i++)
     {
@@ -203,9 +219,7 @@ static void audio_callback(CallbackData *userdata, Uint8 *stream, int len)
             continue;
         }
         int byte_count = len > bytes_left ? bytes_left : len;
-        // printf("\tb: sound: %d,total_len:%d, audio_pos: %d, byte_count: %d\n", i, total_len, userdata[i].audio_pos, byte_count);
         SDL_MixAudioFormat(stream, (Uint8 *)(audio16_buffer[i] + audio_pos), dev_wav_spec.format, byte_count, SDL_MIX_MAXVOLUME); // mix from one buffer into another
         userdata[i].audio_pos += byte_count / sizeof(Sint16);
-        // printf("\ta: sound: %d,total_len:%d, audio_pos: %d, byte_count: %d\n", i,total_len, userdata[i].audio_pos, byte_count);
     }
 }
