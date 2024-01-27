@@ -18,7 +18,7 @@ static void screen_tick(PortDevice *device)
     }
 }
 
-void emu_screen_done(PortDevice *device)
+static void emu_screen_done(PortDevice *device)
 {
     free(device->data);
     free(device);

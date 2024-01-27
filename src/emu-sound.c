@@ -152,6 +152,21 @@ static void sound_tick(PortDevice *device)
 
 static void (*port_write_array[])(PortDevice *g, int v) = {port_write_0, port_write_1};
 
+static void emu_sound_done(PortDevice *device)
+{
+    if (!--init_count)
+    {
+        SDL_CloseAudio();
+        for (int i = 0; i < SOUND_COUNT; i++)
+        {
+            free(audio16_buffer[i]);
+        }
+        SDL_Quit();
+    }
+    free(device->data);
+    free(device);
+}
+
 PortDevice *emu_sound_init()
 {
     if (!init_count++)
@@ -191,20 +206,6 @@ PortDevice *emu_sound_init()
     return device;
 }
 
-void emu_sound_done(PortDevice *device)
-{
-    if (!--init_count)
-    {
-        SDL_CloseAudio();
-        for (int i = 0; i < SOUND_COUNT; i++)
-        {
-            free(audio16_buffer[i]);
-        }
-        SDL_Quit();
-    }
-    free(device->data);
-    free(device);
-}
 
 static void audio_callback(CallbackData *userdata, Uint8 *stream, int len)
 {

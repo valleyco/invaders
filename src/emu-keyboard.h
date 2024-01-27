@@ -28,12 +28,12 @@
 #define KEY_VIRTUAL_OFF 20
 
 #define KEY_MAX_ID KEY_VIRTUAL_OFF
-
-typedef struct // this first field should match struct PortDevice
+#ifdef __cplusplus
+extern "C"
 {
-    int key_status[KEY_MAX_ID + 1];
-} KeyboardDeviceData;
-
-int handle_keyboard_event(PortDevice *device, int keyVal, int pressed);
-PortDevice *emu_keyboard_init(KeyEvent *keyEventHandler);
-void emu_keyboard_done(PortDevice *dev);
+#endif
+    PortDevice *emu_keyboard_init(KeyEvent *keyEventHandler);
+    int handle_keyboard_event(PortDevice *device, int keyVal, int pressed);
+#ifdef __cplusplus
+}
+#endif

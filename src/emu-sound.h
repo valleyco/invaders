@@ -1,6 +1,11 @@
 #pragma once
 #include <stddef.h>
 #include "emu-device.h"
-
-PortDevice *emu_sound_init();
-void emu_sound_done(PortDevice *dev);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    PortDevice *emu_sound_init();
+#ifdef __cplusplus
+}
+#endif

@@ -1,4 +1,8 @@
 #include "emu-keyboard.h"
+typedef struct // this first field should match struct PortDevice
+{
+    int key_status[KEY_MAX_ID + 1];
+} KeyboardDeviceData;
 
 static int port_bit_map[3][8] = {
     // MSB -> LSB
@@ -35,6 +39,12 @@ static int emu_keyboard_read_port_2(PortDevice *device)
 
 static int (*port_read_array[])(PortDevice *g) = {emu_keyboard_read_port_0, emu_keyboard_read_port_1, emu_keyboard_read_port_2};
 
+static void emu_keyboard_done(PortDevice *device)
+{
+    free(device->data);
+    free(device);
+}
+
 PortDevice *emu_keyboard_init(KeyEvent *keyEventHandler)
 {
     PortDevice *device = malloc(sizeof(PortDevice));
@@ -52,58 +62,48 @@ PortDevice *emu_keyboard_init(KeyEvent *keyEventHandler)
     return device;
 }
 
-void emu_keyboard_done(PortDevice *device)
+static struct EmuKeyboardMap
 {
-    free(device->data);
-    free(device);
-}
+    int key;
+    int si_key;
+} emu_keyboard_map[] = {
+    {.key = GDK_KEY_Left, .si_key = KEY_P1_LEFT},
+    {.key = GDK_KEY_Z, .si_key = KEY_P1_LEFT},
+    {.key = GDK_KEY_z, .si_key = KEY_P1_LEFT},
 
-static int get_key_action(int keyVal)
-{
-    switch (keyVal)
-    {
-    case GDK_KEY_Left:
-    case GDK_KEY_Z:
-    case GDK_KEY_z:
-        return KEY_P1_LEFT;
-    case GDK_KEY_X:
-    case GDK_KEY_x:
-    case GDK_KEY_space:
-        return KEY_P1_SHOT;
-    case GDK_KEY_Right:
-    case GDK_KEY_C:
-    case GDK_KEY_c:
-        return KEY_P1_RIGHT;
-    case GDK_KEY_less:
-    case GDK_KEY_comma:
-        return KEY_P2_LEFT;
-    case GDK_KEY_greater:
-    case GDK_KEY_period:
-        return KEY_P2_SHOT;
-    case GDK_KEY_question:
-    case GDK_KEY_slash:
-        return KEY_P2_RIGHT;
-    case GDK_KEY_1:
-        return KEY_P1_START;
-    case GDK_KEY_2:
-        return KEY_P2_START;
-    // case GDK_KEY_space:
-    //     return KEY_SHOT;
-    // case GDK_KEY_Left:
-    //     return KEY_LEFT;
-    // case GDK_KEY_Right:
-    //     return KEY_RIGHT;
-    case GDK_KEY_I:
-    case GDK_KEY_i:
-        return KEY_CREDIT;
-    default:
-        return 0;
-    }
-}
+    {.key = GDK_KEY_X, .si_key = KEY_P1_SHOT},
+    {.key = GDK_KEY_x, .si_key = KEY_P1_SHOT},
+    {.key = GDK_KEY_space, .si_key = KEY_P1_SHOT},
+
+    {.key = GDK_KEY_Right, .si_key = KEY_P1_RIGHT},
+    {.key = GDK_KEY_C, .si_key = KEY_P1_RIGHT},
+    {.key = GDK_KEY_c, .si_key = KEY_P1_RIGHT},
+
+    {.key = GDK_KEY_less, .si_key = KEY_P2_LEFT},
+    {.key = GDK_KEY_comma, .si_key = KEY_P2_LEFT},
+
+    {.key = GDK_KEY_greater, .si_key = KEY_P2_SHOT},
+    {.key = GDK_KEY_period, .si_key = KEY_P2_SHOT},
+
+    {.key = GDK_KEY_question, .si_key = KEY_P2_RIGHT},
+    {.key = GDK_KEY_slash, .si_key = KEY_P2_RIGHT},
+
+    {.key = GDK_KEY_1, .si_key = KEY_P1_START},
+    {.key = GDK_KEY_2, .si_key = KEY_P2_START},
+    {.key = GDK_KEY_I, .si_key = KEY_CREDIT},
+    {.key = GDK_KEY_i, .si_key = KEY_CREDIT},
+    {.key = 0},
+};
 
 int handle_keyboard_event(PortDevice *device, int keyVal, int pressed)
 {
-    int key = get_key_action(keyVal);
-    ((int *)device->data)[key] = pressed ? 1 : 0;
-    return key > 0;
+    for (struct EmuKeyboardMap *map = emu_keyboard_map; map->key; map++)
+    {
+        if (map->key == keyVal)
+        {
+            ((int *)device->data)[map->si_key] = pressed ? 1 : 0;
+            return 1;
+        }
+    }
+    return 0;
 }

@@ -94,12 +94,12 @@ static inline bool handleTicks(Emulator *emulator, int cycles)
 
 static inline bool handleIntr(Emulator *emulator)
 {
-    int mask = 1;
-    int intr = 0;
     if (!emulator->intr)
     {
         return 0;
     }
+    int mask = 1;
+    int intr = 0;
     while (intr < 8)
     {
         if (emulator->intr & mask)

@@ -14,6 +14,11 @@ typedef struct
 #define SHIFTER_DATE_READ 1
 // mapped to port 4 on SI
 #define SHIFTER_DATE_WRITE 2
-
-PortDevice *emu_shifter_init();
-void emu_shifter_done(PortDevice *device);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    PortDevice *emu_shifter_init();
+#ifdef __cplusplus
+}
+#endif

@@ -5,12 +5,19 @@
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 224
 #define SCREEN_BUFFER_LOCATION 0x2400
-typedef struct {
+typedef struct
+{
     int ticks;
-    int* intr;
+    int *intr;
 } ScreenDevice;
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    // void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf);
+    void update_pixbuffer(Emulator *emu, GdkPixbuf *pixbuf);
 
-// void do_update_buffer(const unsigned char *buffer, GdkPixbuf *pixbuf);
-void update_pixbuffer(Emulator *emu, GdkPixbuf *pixbuf);
-
-PortDevice *emu_screen_init(int* intr);
+    PortDevice *emu_screen_init(int *intr);
+#ifdef __cplusplus
+}
+#endif

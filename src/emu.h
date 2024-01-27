@@ -33,8 +33,14 @@ typedef struct
     int dev_ticks_count;
 
 } Emulator;
-
-Emulator *emu_new();
-void emu_free(Emulator *emulator);
-int emu_execute(Emulator *emulator, int clocks_ticks);
-int emu_handle_keyboard(Emulator *emulator, int keyVal, int isPressed);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    Emulator *emu_new();
+    void emu_free(Emulator *emulator);
+    int emu_execute(Emulator *emulator, int clocks_ticks);
+    int emu_handle_keyboard(Emulator *emulator, int keyVal, int isPressed);
+#ifdef __cplusplus
+}
+#endif
