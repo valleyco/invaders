@@ -41,30 +41,34 @@ static void emu_register_device(Emulator *emulator, PortDevice *device, const in
     emulator->devices[emulator->devices_count++] = device;
     for (int n = 0; n < device->readPortCount; n++)
     {
+        int emu_port = readPortMap[n];
         if (device->read[n])
         {
-            if (emulator->dev_read_handler[readPortMap[n]])
+            if (emulator->dev_read_handler[emu_port])
             {
-                printf("device read collision on port %d\n", readPortMap[n]);
+                printf("device read collision on port %d\n", emu_port);
                 exit(1);
             }
-            emulator->dev_read[readPortMap[n]] = device;
-            emulator->dev_read_handler[readPortMap[n]] = device->read[n];
+            emulator->dev_read[emu_port] = device;
+            emulator->dev_read_handler[emu_port] = device->read[n];
         }
     }
+
     for (int n = 0; n < device->writePortCount; n++)
     {
+        int emu_port = writePortMap[n];
         if (device->write[n])
         {
-            if (emulator->dev_write_handler[writePortMap[n]])
+            if (emulator->dev_write_handler[emu_port])
             {
-                printf("device write collision on port %d\n", writePortMap[n]);
+                printf("device write collision on port %d\n", emu_port);
                 exit(1);
             }
-            emulator->dev_write[writePortMap[n]] = device;
-            emulator->dev_write_handler[writePortMap[n]] = device->write[n];
+            emulator->dev_write[emu_port] = device;
+            emulator->dev_write_handler[emu_port] = device->write[n];
         }
     }
+
     if (device->clock_ticks)
     {
         emulator->dev_ticks[emulator->dev_ticks_count++] = device;
@@ -75,7 +79,8 @@ void emu_free(Emulator *emulator)
 {
     while (emulator->devices_count--)
     {
-        (emulator->devices[emulator->devices_count])->dispose(emulator->devices[emulator->devices_count]);
+        PortDevice *device = emulator->devices[emulator->devices_count];
+        device->dispose(device);
     }
     free(emulator->context);
     free(emulator);

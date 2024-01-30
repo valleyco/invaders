@@ -5,3 +5,7 @@ lib_LTLIBRARIES = libemu_8080.la
 libemu_8080_la_SOURCES = emu-8080.c emu-8080.h
 #-fsanitize=address
 libemu_8080_la_CFLAGS = -shared -fpic -Wall -Werror -Wextra -Walloca -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow
+
+noinst_LIBRARIES = libemu_8080.a
+libemu_8080_a_SOURCES = emu-8080.c emu-8080.h
+libemu_8080_a_CFLAGS = -fpic -Wall -Werror -Wextra -Walloca -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow
